@@ -135,7 +135,7 @@ export default function RedPenChallenge({ parameters, disabled }: RedPenProps) {
           <h2 id="red-pen-title" ref={headingRef} tabIndex={-1}>
             The AI made a mistake. Can you catch it?
           </h2>
-          <p>One statement below is deliberately wrong. Regular Animind lessons remain scientifically verified.</p>
+          <p>One statement below is deliberately wrong. Regular AniMind lessons remain scientifically verified.</p>
         </div>
         <button className="icon-button" aria-label="Close Red Pen Challenge" onClick={() => setOpen(false)}>
           <X size={18} />

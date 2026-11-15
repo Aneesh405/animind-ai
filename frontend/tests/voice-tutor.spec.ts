@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { supportsGuidedLesson } from "../lib/guidedLessons";
 import { formatSpeechText } from "../lib/speechText";
 
 type VoiceLog = {
@@ -27,6 +28,7 @@ async function installSpeechMock(page: Page, delayedVoices = false) {
     let speaking = false;
     let paused = false;
     let voicesReady = !delayVoiceList;
+    const utterances: MockUtterance[] = [];
     const voiceListeners = new Set<() => void>();
     const voices = [
       { name: "Calm English", lang: "en-US", voiceURI: "calm-en", default: true, localService: true },
@@ -51,6 +53,7 @@ async function installSpeechMock(page: Page, delayedVoices = false) {
       get pending() { return false; },
       getVoices: () => voicesReady ? voices : [],
       speak: (utterance: MockUtterance) => {
+        utterances.push(utterance);
         current = utterance;
         speaking = true;
         paused = false;
@@ -102,6 +105,10 @@ async function installSpeechMock(page: Page, delayedVoices = false) {
         current = null;
       },
     });
+    Object.defineProperty(window, "__finishStaleVoice", {
+      configurable: true,
+      value: () => utterances[0]?.onend?.(),
+    });
     Object.defineProperty(window, "__loadVoices", {
       configurable: true,
       value: () => {
@@ -128,87 +135,135 @@ test("speech formatter preserves meaning while making scientific notation natura
   );
 });
 
-test("Voice Tutor controls real lifecycle, preferences, synchronization, and cleanup", async ({ page }) => {
+test("the guided registry routes only the visualized projectile concepts", () => {
+  expect(["projectile_motion", "launch_angles", "velocity_components"].every(supportsGuidedLesson)).toBe(true);
+  expect(supportsGuidedLesson("bubble_sort")).toBe(false);
+  expect(supportsGuidedLesson("water_molecule")).toBe(false);
+});
+
+test("Guided Lesson controls synchronize speech, visual scenes, preferences, and cleanup", async ({ page }) => {
   await installSpeechMock(page);
   await page.goto("/studio");
   await expect(page.getByTestId("lesson-scene")).toBeVisible();
-  await page.getByRole("button", { name: "Pause animation" }).click();
-  await page.getByTestId("lesson-step-2").click();
-
-  const tutor = page.getByTestId("voice-tutor");
-  await expect(tutor).toContainText("Ready to narrate step 2.");
+  const player = page.getByTestId("guided-player");
+  await expect(player).toContainText("Ready for one synchronized visual lesson.");
   expect((await voiceLog(page)).texts).toEqual([]);
 
-  await tutor.getByRole("button", { name: "Listen" }).click();
-  await expect(tutor).toContainText("Speaking step 2.");
+  await player.getByText("Voice settings").click();
+  await player.getByLabel("Speaking speed").selectOption("faster");
+  await player.getByLabel("Browser voice").selectOption("clear-en");
+  await player.getByRole("button", { name: "Teach me" }).click();
+  await expect(player).toContainText("Teaching scene 1: The launch.");
+  await expect(page.getByTestId("lesson-scene")).toHaveAttribute("data-guided-cue", "show_initial_state");
+  await expect(page.getByTestId("lesson-scene")).toHaveAttribute("data-guided-targets", /initial_velocity/);
   let log = await voiceLog(page);
   expect(log.texts).toHaveLength(1);
   expect(log.texts[0]).not.toMatch(/[*_`<>]/);
+  expect(log.rates.at(-1)).toBe(1.12);
+  expect(log.voices.at(-1)).toBe("clear-en");
 
-  await tutor.getByRole("button", { name: "Pause" }).click();
-  await expect(tutor).toContainText("Narration paused on step 2.");
-  await tutor.getByRole("button", { name: "Resume" }).click();
-  await expect(tutor).toContainText("Speaking step 2.");
+  await player.getByRole("button", { name: "Pause" }).click();
+  await expect(player).toContainText("Paused on scene 1: The launch.");
+  await player.getByRole("button", { name: "Resume" }).click();
+  await expect(player).toContainText("Teaching scene 1: The launch.");
   log = await voiceLog(page);
   expect(log.pauses).toBe(1);
   expect(log.resumes).toBe(1);
 
-  await tutor.getByRole("button", { name: "Stop" }).click();
-  await expect(tutor).toContainText("Ready to narrate step 2.");
-  await tutor.getByText("Voice settings").click();
-  await tutor.getByLabel("Speaking speed").selectOption("faster");
-  await tutor.getByLabel("Browser voice").selectOption("clear-en");
-  await tutor.getByRole("button", { name: "Replay" }).click();
-  log = await voiceLog(page);
-  expect(log.rates.at(-1)).toBe(1.12);
-  expect(log.voices.at(-1)).toBe("clear-en");
+  await page.evaluate(() => (window as unknown as { __finishVoice: () => void }).__finishVoice());
+  await expect(player).toContainText("Moving upward");
+  await expect(page.getByTestId("lesson-scene")).toHaveAttribute("data-guided-cue", "play_ascent");
+  await expect.poll(async () => (await voiceLog(page)).texts.length).toBe(2);
   expect(await page.evaluate(() => localStorage.getItem("animind-voice-rate"))).toBe("faster");
   expect(await page.evaluate(() => localStorage.getItem("animind-voice-uri"))).toBe("clear-en");
 
-  await page.getByRole("button", { name: "Play animation", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Pause animation" })).toBeVisible();
-  await page.getByTestId("lesson-step-3").click();
-  await expect(tutor).toContainText("Ready to narrate step 3.");
-  const cancellationsAfterStepChange = (await voiceLog(page)).cancels;
-  expect(cancellationsAfterStepChange).toBeGreaterThan(0);
+  await page.getByRole("slider", { name: "Launch angle" }).evaluate((element) => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(element, "60");
+    element.dispatchEvent(new Event("input", { bubbles: true }));
+    element.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await expect(page.getByRole("button", { name: "Play animation", exact: true })).toBeVisible();
+  const cancellationsAfterExplore = (await voiceLog(page)).cancels;
+  expect(cancellationsAfterExplore).toBeGreaterThan(0);
 
-  await tutor.getByRole("button", { name: "Listen" }).click();
+  await player.getByRole("button", { name: "Teach me" }).click();
   await page.getByRole("button", { name: "New lesson" }).click();
-  await expect(page.getByTestId("voice-tutor")).toHaveCount(0);
-  expect((await voiceLog(page)).cancels).toBeGreaterThan(cancellationsAfterStepChange);
+  await expect(page.getByTestId("guided-player")).toHaveCount(0);
+  expect((await voiceLog(page)).cancels).toBeGreaterThan(cancellationsAfterExplore);
 });
 
-test("speech completion returns controls to idle and rapid replay never overlaps", async ({ page }) => {
+test("speech completion advances scenes and rapid replay never overlaps", async ({ page }) => {
   await installSpeechMock(page);
   await page.goto("/studio");
   await expect(page.getByTestId("lesson-scene")).toBeVisible();
-  await page.getByRole("button", { name: "Pause animation" }).click();
-  const tutor = page.getByTestId("voice-tutor");
-  await tutor.getByRole("button", { name: "Listen" }).click();
-  await tutor.getByRole("button", { name: "Replay" }).click();
-  await tutor.getByRole("button", { name: "Replay" }).click();
+  const player = page.getByTestId("guided-player");
+  await player.getByRole("button", { name: "Teach me" }).click();
+  await player.getByRole("button", { name: "Replay scene" }).click();
+  await player.getByRole("button", { name: "Replay scene" }).click();
   const log = await voiceLog(page);
   expect(log.texts).toHaveLength(3);
   expect(log.cancels).toBeGreaterThanOrEqual(3);
+  await page.evaluate(() => (window as unknown as { __finishStaleVoice: () => void }).__finishStaleVoice());
+  await expect(player).toContainText("The launch");
   await page.evaluate(() => (window as unknown as { __finishVoice: () => void }).__finishVoice());
-  await expect(tutor).toContainText("Ready to narrate step 1.");
-  await tutor.getByRole("button", { name: "Listen" }).click();
+  await expect(player).toContainText("Moving upward");
   await page.evaluate(() => (window as unknown as { __errorVoice: () => void }).__errorVoice());
-  await expect(tutor).toContainText("Narration could not continue.");
-  await tutor.getByRole("button", { name: "Replay" }).click();
-  await expect(tutor).toContainText("Speaking step 1.");
+  await expect(player).toContainText("Narration stopped unexpectedly.");
+  await player.getByRole("button", { name: "Replay scene" }).click();
+  await expect(player).toContainText("Teaching scene 2: Moving upward.");
+});
+
+test("all registered projectile cues are reachable and visual motion pauses with narration", async ({ page }) => {
+  await installSpeechMock(page);
+  await page.goto("/studio");
+  const player = page.getByTestId("guided-player");
+  const scene = page.getByTestId("lesson-scene");
+  await player.getByRole("button", { name: "Teach me" }).click();
+  const cues = ["show_initial_state", "play_ascent", "highlight_gravity", "hold_at_apex", "play_descent", "show_angle_comparison"];
+  for (let index = 0; index < cues.length; index += 1) {
+    await expect(scene).toHaveAttribute("data-guided-cue", cues[index]);
+    if (index < cues.length - 1) await player.getByRole("button", { name: "Next" }).click();
+  }
+
+  await player.getByRole("button", { name: "Previous" }).click();
+  await expect(scene).toHaveAttribute("data-guided-cue", "play_descent");
+  const visual = scene.locator("svg[data-time]");
+  // Pause immediately after entering the moving scene. Waiting for a positive
+  // timestamp first is racy on slower runners: the 3.8-second descent can
+  // legitimately reach its landing endpoint while Playwright is polling.
+  await player.getByRole("button", { name: "Pause" }).click();
+  const paused = await visual.getAttribute("data-time");
+  await page.waitForTimeout(350);
+  expect(await visual.getAttribute("data-time")).toBe(paused);
+  await player.getByRole("button", { name: "Resume" }).click();
+  await expect.poll(async () => Number(await visual.getAttribute("data-time"))).toBeGreaterThan(Number(paused));
+});
+
+test("the last speech event completes the guide and captions remain optional", async ({ page }) => {
+  await installSpeechMock(page);
+  await page.goto("/studio");
+  const player = page.getByTestId("guided-player");
+  await player.getByRole("button", { name: "Teach me" }).click();
+  await player.getByRole("button", { name: "Captions on" }).click();
+  await expect(page.getByTestId("guided-caption")).toHaveCount(0);
+  for (let index = 0; index < 5; index += 1) await player.getByRole("button", { name: "Next" }).click();
+  await expect(player).toContainText("Comparing angles");
+  await page.evaluate(() => (window as unknown as { __finishVoice: () => void }).__finishVoice());
+  await expect(player).toContainText("Guided lesson complete. Try the understanding check next.");
+  await expect(player.getByRole("button", { name: "Teach again" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Make it click." })).toBeVisible();
 });
 
 test("a delayed browser voice list becomes selectable without remounting", async ({ page }) => {
   await installSpeechMock(page, true);
   await page.goto("/studio");
   await expect(page.getByTestId("lesson-scene")).toBeVisible();
-  const tutor = page.getByTestId("voice-tutor");
-  await tutor.getByText("Voice settings").click();
-  await expect(tutor.getByLabel("Browser voice")).toBeDisabled();
+  const player = page.getByTestId("guided-player");
+  await player.getByText("Voice settings").click();
+  await expect(player.getByLabel("Browser voice")).toBeDisabled();
   await page.evaluate(() => (window as unknown as { __loadVoices: () => void }).__loadVoices());
-  await expect(tutor.getByLabel("Browser voice")).toBeEnabled();
-  await expect(tutor.getByLabel("Browser voice").locator("option")).toHaveCount(2);
+  await expect(player.getByLabel("Browser voice")).toBeEnabled();
+  await expect(player.getByLabel("Browser voice").locator("option")).toHaveCount(2);
 });
 
 test("unsupported speech degrades gracefully and mobile controls remain accessible", async ({ page }) => {
@@ -219,10 +274,11 @@ test("unsupported speech degrades gracefully and mobile controls remain accessib
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/studio");
   await expect(page.getByTestId("lesson-scene")).toBeVisible();
-  const tutor = page.getByTestId("voice-tutor");
-  await expect(tutor).toContainText("Voice Tutor is unavailable in this browser.");
-  await expect(tutor.getByRole("button", { name: "Listen" })).toBeDisabled();
-  await expect(tutor.getByRole("button", { name: "Replay" })).toBeDisabled();
+  const player = page.getByTestId("guided-player");
+  await expect(player).toContainText("Narration is unavailable in this browser.");
+  await expect(player.getByRole("button", { name: "Narration on" })).toBeDisabled();
+  await player.getByRole("button", { name: "Teach me" }).click();
+  await expect(page.getByTestId("lesson-scene")).toHaveAttribute("data-guided-cue", "show_initial_state");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   const accessibility = await new AxeBuilder({ page })
     .exclude("nextjs-portal")

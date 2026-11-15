@@ -2,6 +2,22 @@
 
 Implemented November 14, 2026, in the existing application.
 
+## Curiosity Lab signature redesign — November 15, 2026
+
+The product now presents itself as a living science notebook: warm paper, deep ink, electric blue, coral, and citron; oversized editorial type; tactile borders and offset shadows; and a visible grid connecting the interface to the physics. The redesign uses the existing React, SVG, CSS, and local fonts, with no new runtime dependency.
+
+- The landing hero asks a real question and routes it into the existing studio. Its projectile exhibit remains directly interactive.
+- A new subject-discovery bento makes Physics the single open lab. Mathematics, Biology, Chemistry, and Computer Science are clearly labeled explanation previews, not working labs.
+- The studio is now the **Curiosity Lab**, with a dark exhibit frame around the existing visualization, a more legible teaching companion, tactile parameter experiments, and unified treatments for Voice Tutor and Red Pen Challenge.
+- Existing Demo/Gemini modes, APIs, equations, animation controls, adaptation, PDFs, history, speech, and physics calculations were preserved.
+- Responsive and accessibility coverage includes 320, 390, 768, 1280, and 1440px states. A final 320px MathML containment fix prevents a long selected-step equation from widening the document.
+
+This work lives on local branch `feature/curiosity-lab-redesign`. It has not been pushed or deployed.
+
+## Synchronized teaching player — November 15, 2026
+
+Voice and animation are now presented as one dark exhibit controller inside the visualization. **Teach me** starts a six-scene projectile guide; captions, real speech state, scene progress, pause/resume, navigation, replay, narration, and device voice settings share the same surface. Citron signals the active teaching action and highlighted SVG evidence. The interface deliberately shows scene progress instead of a fake audio waveform.
+
 ## Direction
 
 A warm scientific notebook: off-white paper, precise diagrams, generous margins, and a focused learning companion. Blue identifies actions and the principal 45-degree trajectory; coral identifies the selected projectile; teal identifies variables and velocity components; gold marks a change in teaching perspective. Labels and line styles supplement the palette.

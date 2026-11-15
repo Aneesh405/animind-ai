@@ -1,5 +1,17 @@
 # Animind AI implementation status
 
+## Current synchronized audiovisual teaching engine
+
+The Curiosity Lab now has one authoritative Guided Lesson controller inside the projectile visualization. A strict frontend registry maps all three existing projectile topic routes to six deterministic scenes with allowlisted visualizations, cues, highlight targets, parameters, captions, and narration. Browser speech `onend` advances scenes; pause/resume affects speech and visual motion together; stale callbacks, overlap, lesson switching, unsupported speech, reduced motion, and manual parameter changes have explicit behavior. No animation cue comes from Gemini, and no video or paid audio service was added.
+
+Physics/projectile motion is the only implemented visual subject and therefore the only synchronized subject. Mathematics, chemistry, biology, computer science, pendulum, force, molecule, cell, and sorting guides remain unavailable rather than displaying unrelated visuals. Current verification: **98 backend tests passed**, TypeScript passed, and the complete default frontend suite finished with **57 passed, one explicitly opt-in live-Gemini test skipped, and zero failed**. Production-build results are recorded in `TEST_REPORT.md`.
+
+## Current Curiosity Lab redesign
+
+The signature redesign is complete locally on `feature/curiosity-lab-redesign`. The landing page, functional question console, live projectile exhibit, honest subject previews, studio exhibit frame, learning companion, Voice Tutor, and Red Pen Challenge now share one original visual system. No backend contract or working feature was removed. Physics remains the only fully interactive subject; the other four subject cards are intentionally labeled previews.
+
+Current verification: **98 backend tests passed**, TypeScript and the production build passed, and the complete default frontend suite finished with **54 passed, one explicitly opt-in live-Gemini test skipped, and zero failed**. Manual audible voice quality, non-Chromium browsers, real mobile hardware, and the opt-in quota-consuming Gemini browser test are outside this redesign verification.
+
 ## Current Voice Tutor and Red Pen features
 
 The local `feature/voice-tutor` branch includes the verified three-question Red Pen Challenge plus a reusable, opt-in, step-level Voice Tutor. Voice Tutor uses only the browser's installed speech synthesis, supports Listen/Pause/Resume/Replay/Stop, speaks naturalized scientific notation, remembers local speed/voice preferences, and cancels on step, lesson, setting, or page changes. It adds no Gemini request, backend audio, API key, dependency, or autoplay.
@@ -28,7 +40,7 @@ The comparable uncached lesson measurements were 3.762 s before and 3.730 s afte
 - Text-PDF extraction, supported-topic selection, relevant page references, and upload validation.
 - Session-owned SQLite lesson history, document expiry, and optimistic mutation revisions.
 - Input validation, canonical equations, SymPy checks, useful errors, and protected backend credentials.
-- Reusable step-level Voice Tutor with browser-local speech, lifecycle-safe controls, natural scientific phrasing, and local preferences.
+- Integrated Guided Lesson player with browser-local speech, scene-level visual cues, synchronized pause/resume, captions, lifecycle-safe controls, and local voice preferences.
 - Windows setup/start scripts, README, and judging walkthrough.
 - The Learning Atelier landing page at `/` and redesigned studio at `/studio`.
 - Local Inter/Instrument Serif fonts, native MathML equations, an original curve mark, and matching SVG/ICO icons.

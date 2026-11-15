@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import "./tokens.css";
 import "./landing.css";
+import "./curiosity-lab.css";
 
 const inter = localFont({
   src: "./fonts/Inter-Variable.ttf",
@@ -19,9 +20,9 @@ const editorial = localFont({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "Animind AI — Don't Just Learn It. See It.",
+  title: "AniMind — Big Ideas, Made Visible",
   description:
-    "Don't Just Learn It. See It. Explore physics through verified interactive simulations and adaptive visual explanations.",
+    "Ask the question. Play with the concept. Watch understanding click through verified interactive physics and adaptive visual explanations.",
 };
 export default function RootLayout({
   children,

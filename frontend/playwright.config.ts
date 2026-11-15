@@ -24,7 +24,11 @@ export default defineConfig({
       timeout: 30000,
     },
     {
-      command: "npm run dev -- --hostname 127.0.0.1",
+      // CI builds the app before Playwright runs. Serving that build avoids a
+      // second, cold development compilation competing with the browser tests.
+      command: process.env.CI
+        ? "npm run start -- --hostname 127.0.0.1"
+        : "npm run dev -- --hostname 127.0.0.1",
       url: "http://localhost:3000",
       reuseExistingServer: true,
       timeout: 90000,
