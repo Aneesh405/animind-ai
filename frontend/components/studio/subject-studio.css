@@ -1,0 +1,146 @@
+.subject-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.subject-tabs button {
+  padding: 10px 14px;
+  border-radius: 8px;
+  min-height: 44px;
+}
+.subject-tabs button[aria-pressed="true"] {
+  background: var(--blue-soft);
+  color: var(--blue);
+  box-shadow: inset 0 0 0 1px var(--blue);
+}
+.subject-workspace {
+  margin: 0 auto;
+  max-width: 1050px;
+  padding: 32px 24px 80px;
+}
+.subject-question {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  align-items: end;
+}
+.subject-question label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+.subject-question label:first-child {
+  flex: 1;
+}
+.subject-question input,
+.subject-question select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 44px;
+  background: var(--surface);
+  color: var(--ink);
+  max-width: 100%;
+}
+.subject-lesson {
+  margin-top: 28px;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.subject-lesson h2 {
+  font:
+    36px var(--font-editorial),
+    serif;
+  margin: 12px 0;
+}
+.subject-lesson h3 {
+  margin: 18px 0 12px;
+}
+.subject-lesson p {
+  line-height: 1.7;
+  margin: 16px 0;
+}
+.subject-lesson small,
+.subject-hint {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.subject-hint {
+  margin: 16px 0;
+  font-size: 14px;
+}
+.subject-lesson button {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--alternate);
+  padding: 10px 14px;
+  min-height: 44px;
+  color: var(--ink);
+}
+.subject-lesson button[aria-pressed="true"] {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.subject-lesson button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.subject-lesson input {
+  max-width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.subject-workspace :focus-visible,
+.subject-tabs :focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+.subject-lesson svg [role="button"]:focus-visible {
+  outline: 3px solid var(--blue);
+}
+@media (max-width: 600px) {
+  .subject-workspace {
+    padding: 24px 12px 60px;
+  }
+  .subject-tabs {
+    padding: 8px;
+    gap: 4px;
+  }
+  .subject-tabs button {
+    font-size: 12px;
+    padding: 8px;
+  }
+  .subject-question {
+    padding: 12px;
+  }
+  .subject-question label:first-child {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+  .subject-question input {
+    min-width: 0 !important;
+    width: 100%;
+  }
+  .subject-lesson {
+    padding: 16px;
+  }
+  .subject-lesson h2 {
+    font-size: 30px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .subject-lesson * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -11,8 +11,8 @@ import LessonCompanion from "./LessonCompanion";
 import LessonReferences from "./LessonReferences";
 import RedPenChallenge from "./RedPenChallenge";
 
-export default function LearningStudio() {
-  const studio = useLearningStudio();
+export default function LearningStudio({initial}: {initial?: {question: string; mode: "demo" | "gemini"}} = {}) {
+  const studio = useLearningStudio(initial);
   const { lesson, busy, error } = studio;
   return (
     <div className="studio-shell">

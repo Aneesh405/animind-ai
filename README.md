@@ -1,5 +1,7 @@
 # Animind AI
 
+[![CI](https://github.com/Aneesh405/animind-ai/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Aneesh405/animind-ai/actions/workflows/ci.yml)
+
 **Don’t Just Learn It. See It.**
 
 Animind turns a physics question into a step-by-step animated lesson. Select a confusing step, describe what feels unclear, and the tutor switches to another visual teaching strategy. Change a variable, compare the calculated results, and answer a short conceptual check.
@@ -7,6 +9,10 @@ Animind turns a physics question into a step-by-step animated lesson. Select a c
 This MVP focuses on ideal projectile motion, launch-angle comparisons, and initial velocity components. It includes three deterministic SVG scenes and an optional Gemini teaching planner.
 
 The Curiosity Lab redesign adds a distinctive, interactive public landing page at `/` and a tactile scientific workspace at `/studio`. Its warm-paper, ink, electric-blue, coral, and citron system frames the existing deterministic physics rather than replacing it. Physics is the one open lab; four additional subjects are honestly labeled previews. Inter and Instrument Serif are hosted locally, canonical equations use native MathML, and the physics canvas has dedicated desktop/mobile layouts. The backend, secure Gemini configuration, Demo workflow, Voice Tutor, and Red Pen Challenge are preserved. Design decisions are recorded in [DESIGN_CHANGELOG.md](DESIGN_CHANGELOG.md).
+
+## Multi-subject learning
+
+The studio now includes Mathematics, Physics, Chemistry, Biology, and Computer Science. Eight trusted interactive visualizations cover linear/quadratic functions, projectile motion, a simple pendulum, Newton’s second law, water, an animal cell, and bubble sort. Other topics use written explanations. The existing projectile notebook, Voice Tutor, and Red Pen remain available. See [MULTI_SUBJECT_LEARNING.md](MULTI_SUBJECT_LEARNING.md) for demos, architecture, scientific limits, test results, and macOS/Linux launch commands.
 
 ## What you can do
 
