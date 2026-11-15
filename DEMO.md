@@ -50,6 +50,14 @@ Confusion:
 
 Gemini may start with trajectories, velocity decomposition, or range-comparison bars. Each is a valid result. Adaptation must change the current representation; the banner and actual diagram show the difference. The demonstration does not depend on a fixed model-generated title or answer order.
 
+## Voice Tutor
+
+In **Your Learning Companion**, choose a lesson step and select **Listen** in its Voice Tutor panel. While narration is active, demonstrate **Pause**, **Resume**, **Replay**, and **Stop**; the projectile controls remain interactive throughout. Voice settings offer Slower, Normal, and Faster rates plus only the voices installed in the current browser. Narration is browser-local, never autoplays, and makes no Gemini request. If speech synthesis is unavailable, the written explanation and animation continue normally.
+
+## Optional Red Pen Challenge
+
+Below the lesson, select **Try Red Pen Challenge**. Each of the three activities contains exactly one deliberate misconception and is clearly separated from normal tutoring. Choose a statement, select **Check Answer**, then use **Show Me Why** to open the real projectile visualizer. The sequence demonstrates 30/45/60-degree range, nonzero horizontal velocity at the apex, and the equal ranges but different paths of complementary angles. It is deterministic, works in Demo mode, and makes no Gemini request.
+
 ## Reliable Demo-mode fallback
 
 Select **Demo mode** and click **Visualize** to generate a fresh Demo lesson. Changing the selector alone does not change an existing lesson's provenance or adaptation engine.

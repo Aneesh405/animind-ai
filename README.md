@@ -19,6 +19,8 @@ The Learning Atelier redesign adds an interactive public landing page at `/` and
 - Upload text-based lecture PDFs, choose a detected supported topic, and inspect page-numbered source excerpts.
 - Reopen recent lessons stored in local SQLite. A browser session ID in local storage connects the browser to its lessons.
 - Listen to explanations when the browser provides speech synthesis.
+- Use the step-level **Voice Tutor** to listen, pause, resume, replay, or stop narration while the animation stays interactive. Speed and installed-browser voice preferences are remembered locally.
+- Open the optional **Red Pen Challenge** inside a projectile lesson, spot one verified misconception, and use the same SVG physics engine to see the correction.
 
 ## Technology and scope
 
@@ -162,6 +164,14 @@ The first visit to the studio opens a clearly labelled Demo lesson, or restores 
 
 Try “Why does a projectile travel farthest at 45 degrees?”, select the second step, and enter “I don't understand why 60 degrees doesn't travel farther.” Click **Explain it differently** to switch to velocity decomposition. The three-minute walkthrough and exact Windows startup commands are in [DEMO.md](DEMO.md).
 
+### Voice Tutor
+
+The lesson companion includes a reusable browser-based Voice Tutor for the currently displayed teaching step. It uses `window.speechSynthesis` only after the student selects **Listen**; it never autoplays, adds no Gemini request, creates no audio file, and requires no additional key. Changing steps, lessons, or pages cancels the previous utterance. Scientific notation and common units are converted to natural speech without changing the visible explanation. Voice availability and quality depend on the browser and operating system; unsupported browsers retain the full written lesson and animation.
+
+### Red Pen Challenge
+
+The optional **Red Pen Challenge** works entirely from a deterministic three-question bank, so it adds no Gemini request and works in Demo mode. Open it below the current lesson with **Try Red Pen Challenge**. The MVP covers maximum range, velocity at the apex, and complementary launch angles. Deliberately incorrect statements are confined to this clearly labelled activity; ordinary lessons remain unchanged.
+
 ## PDF handling and local data
 
 Upload a text-based PDF through **Upload lecture notes** or **Add a PDF**. Uploads are limited to 10 MB, 100 pages, and 250,000 extracted characters. Password-protected, empty, unreadable, and scanned-only PDFs receive an explanatory error. Detected topics appear as buttons.
@@ -193,7 +203,7 @@ Playwright starts missing local servers and reuses servers already running on po
 
 To serve the built frontend, run `npm run start -- --hostname 127.0.0.1 --port 3000` from `frontend`, with the backend running in a separate terminal.
 
-Backend tests cover classification, demo generation, adaptation history, session ownership, optimistic concurrency, invalid input, PDF validation, mathematical relationships, Gemini errors, cache isolation/expiry/concurrency, and timing privacy. An HTTP mock transport exercises the installed official Gemini SDK's request serialization and structured lesson/adaptation responses. The default frontend suite contains 38 Chrome scenarios and five pure physics/synchronization checks. It covers the Demo journey, landing navigation, PDFs, failures/loading, reduced motion, responsive controls, actual SVG strategy changes, live vector geometry, chapter selection, and accessibility. One additional real Gemini browser test is opt-in; it also verifies labeled plan reuse. See [TEST_REPORT.md](TEST_REPORT.md) for actual results and [STATUS.md](STATUS.md) for scope.
+Backend tests cover classification, demo generation, adaptation history, session ownership, optimistic concurrency, invalid input, PDF validation, mathematical relationships, Gemini errors, cache isolation/expiry/concurrency, and timing privacy. An HTTP mock transport exercises the installed official Gemini SDK's request serialization and structured lesson/adaptation responses. The default frontend suite contains 45 Chrome scenarios and eight pure physics/challenge-bank/speech checks. It covers the Demo journey, Voice Tutor lifecycle, Red Pen Challenge, landing navigation, PDFs, failures/loading, reduced motion, responsive controls, actual SVG strategy changes, live vector geometry, chapter selection, and accessibility. One additional real Gemini browser test is opt-in; it also verifies labeled plan reuse. See [TEST_REPORT.md](TEST_REPORT.md) for actual results and [STATUS.md](STATUS.md) for scope.
 
 ## Troubleshooting
 

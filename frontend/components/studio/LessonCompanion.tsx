@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowDown, ArrowRight, Check, ChevronRight, Lightbulb, Repeat2, Volume2, VolumeX } from "lucide-react";
+import { ArrowDown, ArrowRight, Check, ChevronRight, Lightbulb, Repeat2 } from "lucide-react";
 import Equation from "../Equation";
 import type { StudioState } from "../../lib/useLearningStudio";
 import { visualEvidence } from "../../lib/walkthrough";
+import VoiceTutorControls from "./VoiceTutorControls";
 
 export default function LessonCompanion({ studio: s }: { studio: StudioState }) {
   const lesson = s.lesson;
@@ -11,7 +12,7 @@ export default function LessonCompanion({ studio: s }: { studio: StudioState }) 
   const visibleStep = s.selectedStep || lesson.steps[Math.min(s.activeStage, lesson.steps.length - 1)];
   return (
     <aside className="teaching-column" aria-label="Step-by-step tutor">
-      <div className="tutor-header"><div><span className="eyebrow">YOUR LEARNING COMPANION</span><h2>One idea at a time.</h2></div><button className={`icon-button ${s.speaking ? "speaking" : ""}`} aria-label={s.speaking ? "Stop narration" : "Read explanation aloud"} title={s.speechAvailable ? "Read this explanation aloud" : "Speech synthesis is unavailable in this browser"} disabled={!s.speechAvailable} onClick={s.narrate}>{s.speaking ? <VolumeX size={17} /> : <Volume2 size={17} />}</button></div>
+      <div className="tutor-header"><div><span className="eyebrow">YOUR LEARNING COMPANION</span><h2>One idea at a time.</h2></div></div>
       <p className="step-instruction">Follow the steps. Stop wherever you need to.</p>
       <div className="lesson-progress" role="progressbar" aria-label="Current visual stage" aria-valuemin={1} aria-valuemax={lesson.steps.length} aria-valuenow={(s.selectedIndex >= 0 ? s.selectedIndex : s.activeStage) + 1}>{lesson.steps.map((step, index) => <span key={step.id} className={index <= (s.selectedIndex >= 0 ? s.selectedIndex : s.activeStage) ? "reached" : ""} />)}<small>{(s.selectedIndex >= 0 ? s.selectedIndex : s.activeStage) + 1} / {lesson.steps.length}</small></div>
       <nav className="lesson-steps" aria-label="Lesson steps">
@@ -20,6 +21,11 @@ export default function LessonCompanion({ studio: s }: { studio: StudioState }) 
       <div className="selected-explanation" key={s.selectedStep?.id || lesson.scene}>
         <span className="small-label">{s.selectedStep ? `A CLOSER LOOK · STEP ${s.selectedIndex + 1}` : "THE IDEA TO NOTICE"}</span>
         <p>{visibleStep.text}</p>
+        <VoiceTutorControls
+          text={`${visibleStep.title}. ${visibleStep.text}`}
+          contentKey={`${lesson.id}:${lesson.revision}:${lesson.scene}:${visibleStep.id}`}
+          stepLabel={`step ${s.selectedStep ? s.selectedIndex + 1 : Math.min(s.activeStage, lesson.steps.length - 1) + 1}`}
+        />
         <Equation equationKey={visibleStep.equation_key} />
       </div>
 

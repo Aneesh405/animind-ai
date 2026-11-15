@@ -1,5 +1,11 @@
 # Animind AI implementation status
 
+## Current Voice Tutor and Red Pen features
+
+The local `feature/voice-tutor` branch includes the verified three-question Red Pen Challenge plus a reusable, opt-in, step-level Voice Tutor. Voice Tutor uses only the browser's installed speech synthesis, supports Listen/Pause/Resume/Replay/Stop, speaks naturalized scientific notation, remembers local speed/voice preferences, and cancels on step, lesson, setting, or page changes. It adds no Gemini request, backend audio, API key, dependency, or autoplay.
+
+Current verification: **98 backend tests passed**; the complete default frontend run finished with **53 passed, 1 explicitly opt-in live-Gemini test skipped, and 0 failed**. TypeScript and production build passed. Voice lifecycle tests use a deterministic speech API mock; actual audible output and operating-system voice quality still require manual verification on the demo computer.
+
 ## Current performance and teaching follow-up
 
 The `feature/animated-teaching-performance` branch adds six synchronized visual chapters, moving velocity vectors with constant horizontal/changing vertical components and downward gravity, shared-time range bars, angle-comparison evidence, equation-linked tutor focus, truthful loading, nonblocking health refresh, and clearly labeled session-scoped validated-plan caching. Existing design, APIs, PDF and live Gemini workflows are preserved. Verification was completed locally before the separately authorized GitHub publication; consult the branch history for publication status.
@@ -22,7 +28,7 @@ The comparable uncached lesson measurements were 3.762 s before and 3.730 s afte
 - Text-PDF extraction, supported-topic selection, relevant page references, and upload validation.
 - Session-owned SQLite lesson history, document expiry, and optimistic mutation revisions.
 - Input validation, canonical equations, SymPy checks, useful errors, and protected backend credentials.
-- Optional browser narration.
+- Reusable step-level Voice Tutor with browser-local speech, lifecycle-safe controls, natural scientific phrasing, and local preferences.
 - Windows setup/start scripts, README, and judging walkthrough.
 - The Learning Atelier landing page at `/` and redesigned studio at `/studio`.
 - Local Inter/Instrument Serif fonts, native MathML equations, an original curve mark, and matching SVG/ICO icons.

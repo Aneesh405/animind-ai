@@ -1,5 +1,40 @@
 # Animind AI - performance and animated teaching verification
 
+## Voice Tutor verification - November 15, 2026
+
+The step-level **Voice Tutor** was implemented on local branch `feature/voice-tutor`. It uses the browser's `SpeechSynthesis` API and adds no backend request, Gemini request, API key, audio file, or dependency. Narration is opt-in and tied to the actual displayed lesson step. Step changes, lesson changes, navigation, component unmount, replay, preference changes, and cancellation all stop the prior utterance.
+
+| Verification | Result |
+| --- | --- |
+| Focused Voice Tutor suite | **5 passed**: scientific formatter, lifecycle/preferences/synchronization/cleanup, completion/error/rapid replay, delayed voices, unsupported/mobile/axe |
+| Complete backend suite | **98 passed**, 0 failed; one dependency deprecation warning |
+| Frontend type check | **Passed** |
+| Frontend production build | **Passed**; static `/`, `/studio`, `/icon.svg`, and not-found routes generated |
+| Complete default frontend suite | **53 passed, 1 skipped**, 0 failed; the skip is the explicitly opt-in real-Gemini browser test |
+| Visual review | **Passed** for the compact desktop lesson column and 390px mobile layout |
+| Secret review | **Passed**: environment files ignored/untracked, zero configured-secret matches in source/history, zero gitleaks findings |
+
+Automated speech tests use a deterministic browser API mock so state transitions and utterance content can be verified without pretending that headless Chrome produced audible sound. They verify Listen, Pause, Resume, Replay, Stop, no autoplay, overlap prevention, installed voice selection, saved speed/voice preferences, asynchronous `voiceschanged`, completion, synthesis failure, step and lesson cancellation, unmount cleanup, continued animation interaction, unsupported-browser fallback, responsive layout, and WCAG 2 A/AA checks. Actual speaker output, pronunciation quality, and the operating system's installed voice quality require the manual check documented in README.md and DEMO.md.
+
+Red Pen narration was not added: the prompt made it optional, and keeping answer-revealing audio out of that activity is the safer MVP boundary. The normal written Red Pen experience remains unchanged.
+
+## Red Pen Challenge verification - November 14, 2026
+
+The optional projectile-motion **Red Pen Challenge** was implemented on local branch `feature/red-pen-challenge`. It uses a deterministic three-question bank with one indexed misconception per challenge and no Gemini call. Deliberate errors render only after the clearly labelled challenge is opened. **Show Me Why** reuses the production trajectory and velocity-component SVG scenes with values from the existing physics engine.
+
+| Verification | Result |
+| --- | --- |
+| Focused Red Pen suite | **5 passed**: bank integrity, physics claims, full journey, reveal flow, mobile/keyboard/reduced-motion/axe |
+| Complete backend suite | **98 passed**, 0 failed; one dependency deprecation warning |
+| Frontend type check | **Passed** |
+| Frontend production build | **Passed**; `/`, `/studio`, `/icon.svg`, and not-found route prerendered |
+| Complete default frontend suite | **48 passed, 1 skipped**, 0 failed; the skipped test is the explicitly opt-in real-Gemini browser test |
+| Visual review | **Passed** at 1440px desktop and 390px mobile without overflow |
+
+The full browser run retained lesson generation, playback, sliders, adaptive diagrams, PDFs, failure handling, favicon, responsiveness, and accessibility. The Red Pen journey verified retry and reveal actions, all three real SVG corrections, correct numerical evidence, completion scoring, and zero `/api/lesson` or `/api/adapt` requests from the challenge. Live Gemini was not rerun because this feature does not use it and the quota-consuming browser test remains explicitly opt-in. The existing live-integration results below are unchanged.
+
+The Red Pen MVP is intentionally limited to ideal, equal-height projectile motion with no air resistance. Session struggle tracking is local to the mounted challenge and used only for the completion review suggestion. No account, database, leaderboard, or dynamic AI-generated misconception was added.
+
 ## Current result - November 14, 2026
 
 The existing application was improved on branch `feature/animated-teaching-performance`. The premium design, working Demo/Gemini paths, PDF workflow, session ownership, revision handling, scene allowlist, strict plan validation, and existing local changes were preserved. This verification record was captured before the separately authorized commit/push. The source checkpoint is `../animind-checkpoints/before-teaching-fix-20261114-201728.zip`; credentials, dependencies, and runtime data were excluded.
