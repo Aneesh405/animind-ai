@@ -1,5 +1,7 @@
 # Animind AI
 
+[![CI](https://github.com/Aneesh405/animind-ai/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Aneesh405/animind-ai/actions/workflows/ci.yml)
+
 **Don’t Just Learn It. See It.**
 
 Animind turns a physics question into a step-by-step animated lesson. Select a confusing step, describe what feels unclear, and the tutor switches to another visual teaching strategy. Change a variable, compare the calculated results, and answer a short conceptual check.

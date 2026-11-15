@@ -216,16 +216,16 @@ input[type="range"]:disabled { cursor: default; }
 .lesson-progress small { font-size: 9px; color: var(--muted); margin-left: 6px; font-variant-numeric: tabular-nums; }
 .lesson-steps { margin-top: 22px; }
 .lesson-step { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 8px 14px 0; background: none; border: 0; border-bottom: 1px solid var(--border); text-align: left; }
-.step-number { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; font-size: 10px; font-weight: 500; border-radius: 50%; color: var(--muted); border: 1px solid var(--border); transition: all var(--duration); }
+.step-number { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; font-size: 10px; font-weight: 500; border-radius: 50%; color: var(--muted); border: 1px solid var(--border); transition: border-color var(--duration); }
 .step-copy { min-width: 0; flex: 1; }
 .step-copy strong { display: block; font-size: 12px; font-weight: 550; line-height: 1.55; overflow-wrap: anywhere; }
 .step-copy > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; color: var(--muted); margin-top: 3px; }
 .lesson-step > svg { color: #7b8880; }
-.lesson-step:hover:not(:disabled) .step-number { color: var(--blue); border-color: #bdcff5; }
+.lesson-step:hover:not(:disabled):not(.selected) .step-number { color: var(--blue); border-color: #bdcff5; }
 .lesson-step.selected .step-number { background: var(--blue); border-color: var(--blue); color: white; }
 .lesson-step.selected .step-copy strong { color: var(--blue); }
 .lesson-step.visual-active:not(.selected) .step-number { border-color: var(--teal); color: var(--teal); }
-.selected-explanation { margin: 24px 0; animation: reveal 200ms var(--ease); }
+.selected-explanation { margin: 24px 0; animation: reveal-text 200ms var(--ease); }
 .selected-explanation > p { font-size: 12px; line-height: 1.9; color: #56635a; margin-top: 11px; }
 .equation { margin: 18px 0 4px; padding: 17px 8px; background: #f0f3ed; border-radius: 6px; color: #284b41; font-family: "Cambria Math", "STIX Two Math", math, serif; font-size: 18px; overflow-wrap: normal; }
 .confusion-panel { padding: 20px; margin: 26px -1px; border: 1px solid #ebdbbb; border-radius: 9px; background: #fcf6e9; }
@@ -253,7 +253,7 @@ input[type="range"]:disabled { cursor: default; }
 .check-option:hover, .check-option.chosen { border-color: #bdcced; background: var(--blue-soft); }
 .check-button { display: flex; align-items: center; justify-content: space-between; min-height: 42px; width: 100%; margin-top: 13px; padding: 10px 12px; border: 1px solid #ced8cb; background: #edf1e9; border-radius: 6px; color: #395441; font-size: 11px; font-weight: 550; }
 .check-button:hover:not(:disabled) { background: #e1e9db; }
-.check-feedback { padding: 16px; margin-top: 16px; border: 1px solid #c2ded1; border-radius: 7px; background: #ebf5ee; color: #2a6752; animation: reveal 180ms var(--ease); }
+.check-feedback { padding: 16px; margin-top: 16px; border: 1px solid #c2ded1; border-radius: 7px; background: #ebf5ee; color: #2a6752; animation: reveal-text 180ms var(--ease); }
 .check-feedback.revisit { border-color: #e6d2b0; background: #fbf3e2; color: #7a5b21; }
 .check-feedback strong { display: flex; gap: 7px; align-items: flex-start; font-size: 12px; }
 .check-feedback strong svg { flex-shrink: 0; }
@@ -271,6 +271,8 @@ input[type="range"]:disabled { cursor: default; }
 .empty-state p { max-width: 420px; margin: 18px auto 24px; color: var(--muted); font-size: 13px; line-height: 1.8; }
 .empty-state small { display: block; margin-top: 20px; color: var(--muted); font-size: 10px; }
 @keyframes reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+/* Keep text contrast stable throughout its entrance motion. */
+@keyframes reveal-text { from { transform: translateY(4px); } to { transform: translateY(0); } }
 
 @media (min-width: 1600px) {
   .workspace { padding-top: 46px; }
