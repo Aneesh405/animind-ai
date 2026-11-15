@@ -251,3 +251,8 @@ def upload_pdf(session_id: UUID = Form(...), file: UploadFile = File(...)):
         return extract_pdf(file, session_id, store)
     finally:
         file.file.close()
+
+# Multi-subject lessons share the server and credential boundary without altering
+# the established projectile lesson, adaptation, PDF, or challenge contracts.
+from visual_learning import router as visual_router
+app.include_router(visual_router)

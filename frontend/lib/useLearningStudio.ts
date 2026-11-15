@@ -7,11 +7,11 @@ import type { CheckResult, Health, Lesson, LessonSummary, Mode, Parameters, PDFD
 
 export const INITIAL_QUESTION = "Why does a projectile travel farthest at 45 degrees?";
 
-export function useLearningStudio() {
+export function useLearningStudio(initialRequest?: { question: string; mode: Mode }) {
   const [sessionId, setSessionId] = useState("");
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [question, setQuestion] = useState(INITIAL_QUESTION);
-  const [mode, setMode] = useState<Mode>("demo");
+  const [mode, setMode] = useState<Mode>(initialRequest?.mode ?? "demo");
   const [parameters, setParameters] = useState<Parameters>(DEFAULT_PARAMETERS);
   const [recent, setRecent] = useState<LessonSummary[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -80,10 +80,10 @@ export function useLearningStudio() {
         setHealth(status);
         setTopics(supported);
         setRecent(history);
-        const requested = new URLSearchParams(window.location.search).get("question")?.trim().slice(0, 1500);
+        const requested = initialRequest?.question || new URLSearchParams(window.location.search).get("question")?.trim().slice(0, 1500);
         if (requested) setQuestion(requested);
         const initial = requested
-          ? await api<Lesson>("/api/lesson", { session_id: id, question: requested, mode: "demo" })
+          ? await api<Lesson>("/api/lesson", { session_id: id, question: requested, mode: initialRequest?.mode ?? "demo" })
           : history.length
           ? await api<Lesson>(`/api/lessons/${history[0].id}?session_id=${id}`)
           : await api<Lesson>("/api/lesson", {

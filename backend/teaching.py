@@ -182,7 +182,7 @@ def planner_error(status: int, code: str, message: str):
     return HTTPException(status, detail={"code": code, "message": message, "demo_available": True})
 
 
-def generate_plan(schema: type[PlannerResult], context: dict) -> PlannerResult:
+def generate_plan(schema: type[PlannerResult], context: dict, system_instruction: str = SYSTEM_INSTRUCTION) -> PlannerResult:
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     model = os.getenv("GEMINI_MODEL", "").strip()
     if not api_key:
@@ -205,7 +205,7 @@ def generate_plan(schema: type[PlannerResult], context: dict) -> PlannerResult:
                     model=model,
                     contents=json.dumps(context, ensure_ascii=False),
                     config=types.GenerateContentConfig(
-                        system_instruction=SYSTEM_INSTRUCTION,
+                        system_instruction=system_instruction,
                         response_mime_type="application/json",
                         # Native response_schema rejects Pydantic's additionalProperties.
                         response_json_schema=schema.model_json_schema(),
@@ -221,7 +221,7 @@ def generate_plan(schema: type[PlannerResult], context: dict) -> PlannerResult:
             # Measurements and expressions are owned by the verified physics engine.
             prose = result.model_dump_json()
             numbers = re.findall(r"(?<![a-zA-Z_])\d+(?:\.\d+)?", prose)
-            if any(value not in {"0", "1", "2", "30", "45", "60", "90"} for value in numbers):
+            if schema in (TeachingPlan, AdaptivePlan) and any(value not in {"0", "1", "2", "30", "45", "60", "90"} for value in numbers):
                 raise ValueError("Unverified numerical claim")
         return result
     except errors.APIError as error:
