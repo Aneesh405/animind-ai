@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Maximize2, Pause, Play, RotateCcw } from "lucide-react";
 import { calculate, SCENE_NAMES } from "../lib/physics";
 import type { Parameters, SceneType, Step } from "../lib/types";
 import { CHAPTERS, CHAPTER_STARTS, flightProgress, focusProgress, stepForChapter, visualChapter, WALKTHROUGH_MS, walkthrough } from "../lib/walkthrough";
 import Equation from "./Equation";
 import { COLORS, SELECTED_COLOR, Components, RangeComparison, Trajectories } from "./physics/SceneDiagrams";
+import type { GuidedScene } from "../lib/guidedLessons";
 
 interface SceneProps {
   mode: SceneType;
@@ -20,6 +21,8 @@ interface SceneProps {
   focusVersion?: number;
   onInteract?: () => void;
   comparisonAngles?: number[];
+  guided?: { scene: GuidedScene; playing: boolean; run: number };
+  guidedControls?: ReactNode;
 }
 
 export default function ProjectileScene({
@@ -34,6 +37,8 @@ export default function ProjectileScene({
   focusVersion = 0,
   onInteract,
   comparisonAngles,
+  guided,
+  guidedControls,
 }: SceneProps) {
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -48,15 +53,27 @@ export default function ProjectileScene({
   const chapter = visualChapter(progress);
   const goal = steps?.[focusIndex ?? steps.length - 1]?.equation_key || "range";
   // A height step needs an actual apex, even inside a range-comparison lesson.
-  const diagramMode = steps && goal === "height" && chapter === 3 ? "components" : mode;
+  const diagramMode = guided?.scene.visualizationId ?? (steps && goal === "height" && chapter === 3 ? "components" : mode);
   const stage = steps ? stepForChapter(steps, chapter, goal) : Math.min(stepCount - 1, Math.floor(progress * stepCount));
-  const motion = steps ? flightProgress(progress) : progress;
+  const motion = guided ? progress : steps ? flightProgress(progress) : progress;
   const teaching = walkthrough(parameters, chapter, goal, diagramMode);
 
   useLayoutEffect(() => {
+    if (guided) return;
     setProgress(0);
     setPlaying(autoplay && !window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, [mode, autoplay]);
+  }, [mode, autoplay, Boolean(guided)]);
+
+  useLayoutEffect(() => {
+    if (!guided) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setProgress(reduced ? guided.scene.progressEnd : guided.scene.progressStart);
+    setPlaying(!reduced && guided.playing && guided.scene.progressEnd > guided.scene.progressStart);
+  }, [guided?.scene.id, guided?.run]);
+
+  useEffect(() => {
+    if (guided) setPlaying(!window.matchMedia("(prefers-reduced-motion: reduce)").matches && guided.playing && progress < guided.scene.progressEnd);
+  }, [guided?.playing]);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -91,9 +108,10 @@ export default function ProjectileScene({
         return;
       }
       if (previousTime) {
-        const delta = Math.min(now - previousTime, 100) / (steps ? WALKTHROUGH_MS : 9500);
+        const duration = guided?.scene.visualDurationMs || (steps ? WALKTHROUGH_MS : 9500);
+        const delta = Math.min(now - previousTime, 100) / Math.max(duration, 1);
         // Leave the conclusion visible until the student explicitly replays.
-        setProgress((value) => steps ? Math.min(1, value + delta) : (value + delta) % 1);
+        setProgress((value) => guided ? Math.min(guided.scene.progressEnd, value + delta * (guided.scene.progressEnd - guided.scene.progressStart)) : steps ? Math.min(1, value + delta) : (value + delta) % 1);
       }
       previousTime = now;
       frame = window.requestAnimationFrame(animate);
@@ -102,9 +120,9 @@ export default function ProjectileScene({
     document.addEventListener("visibilitychange", resetClock);
     frame = window.requestAnimationFrame(animate);
     return () => { window.cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", resetClock); };
-  }, [playing, Boolean(steps)]);
+  }, [playing, Boolean(steps), guided?.scene.id, guided?.scene.progressStart, guided?.scene.progressEnd, guided?.scene.visualDurationMs]);
 
-  useEffect(() => { if (steps && progress >= 1) setPlaying(false); }, [progress, steps]);
+  useEffect(() => { if ((guided && progress >= guided.scene.progressEnd) || (!guided && steps && progress >= 1)) setPlaying(false); }, [progress, steps, guided?.scene.progressEnd]);
 
   useEffect(() => {
     const onFullscreen = () => setExpanded(Boolean(document.fullscreenElement));
@@ -128,21 +146,23 @@ export default function ProjectileScene({
       data-testid="lesson-scene"
       data-scene={mode}
       data-chapter={steps ? chapter : undefined}
+      data-guided-cue={guided?.scene.visualCue}
+      data-guided-targets={guided?.scene.highlightTargets.join(" ")}
     >
       <div className="scene-topline">
         <span className="scene-name">
           <span className="live-dot" />
-          {SCENE_NAMES[mode]}
-          {diagramMode !== mode && <small> · apex focus</small>}
+          {SCENE_NAMES[diagramMode]}
+          {!guided && diagramMode !== mode && <small> · apex focus</small>}
         </span>
         <div className="scene-options">
-        {mode === "trajectories" && <label className="comparison-toggle"><input type="checkbox" checked={compare} onChange={(e) => setCompare(e.target.checked)} />Compare angles</label>}
+        {diagramMode === "trajectories" && <label className="comparison-toggle"><input type="checkbox" checked={compare} onChange={(e) => { onInteract?.(); setCompare(e.target.checked); }} />Compare angles</label>}
         <span className="scene-unit">
           v₀ {parameters.speed} m/s <span>·</span> g {parameters.gravity} m/s²
         </span>
         </div>
       </div>
-      {steps && <nav className="visual-chapters" aria-label="Visual walkthrough chapters">{CHAPTERS.map((name, index) => <button key={name} aria-label={`Visual chapter ${index + 1}: ${name}`} aria-current={chapter === index ? "step" : undefined} onClick={() => { onInteract?.(); setProgress(CHAPTER_STARTS[index]); setPlaying(false); }}><span>{index + 1}</span>{name}</button>)}</nav>}
+      {steps && !guided && <nav className="visual-chapters" aria-label="Visual walkthrough chapters">{CHAPTERS.map((name, index) => <button key={name} aria-label={`Visual chapter ${index + 1}: ${name}`} aria-current={chapter === index ? "step" : undefined} onClick={() => { onInteract?.(); setProgress(CHAPTER_STARTS[index]); setPlaying(false); }}><span>{index + 1}</span>{name}</button>)}</nav>}
       <div className="scene-canvas">
         {diagramMode === "trajectories" && (
           <Trajectories
@@ -200,14 +220,15 @@ export default function ProjectileScene({
           </>
         )}
       </div>
-      {steps && <>
+      {steps && !guided && <>
         <div className="visual-reasoning" data-testid="visual-reasoning">
           <span className="small-label">VISUAL STEP {chapter + 1} / 6</span><h3>{teaching.title}</h3><p>{teaching.text}</p><p className="visual-evidence"><strong>Look for:</strong> {teaching.evidence}</p>
           <Equation equationKey={teaching.key} />
         </div>
         {mode === "trajectories" && compare && <div className="angle-evidence" aria-label="Equal-speed angle comparison">{[30, 45, 60].map(angle => { const m = calculate(parameters, angle); return <div key={angle} data-testid={`angle-evidence-${angle}`}><strong style={{ color: COLORS[angle] }}>{angle}° {angle === 45 && <small>maximum range</small>}</strong><span>vₓ {m.horizontal_velocity.toFixed(2)} m/s</span><span>Flight {m.flight_time.toFixed(2)} s</span><b>Range {m.range.toFixed(2)} m</b></div>; })}</div>}
       </>}
-      <div className="playback">
+      {guidedControls}
+      {!guided && <div className="playback">
         <button
           className="play-button"
           aria-label={playing ? "Pause animation" : "Play animation"}
@@ -254,7 +275,7 @@ export default function ProjectileScene({
         >
           <Maximize2 size={16} />
         </button>
-      </div>
+      </div>}
     </div>
   );
 }

@@ -6,7 +6,7 @@ Animind turns a physics question into a step-by-step animated lesson. Select a c
 
 This MVP focuses on ideal projectile motion, launch-angle comparisons, and initial velocity components. It includes three deterministic SVG scenes and an optional Gemini teaching planner.
 
-The Learning Atelier redesign adds an interactive public landing page at `/` and a focused scientific notebook at `/studio`. Inter and Instrument Serif are hosted locally, canonical equations use native MathML, and the physics canvas has dedicated desktop/mobile layouts. The existing backend, secure Gemini configuration, and Demo workflow are preserved. Design decisions and the source checkpoint are recorded in [DESIGN_CHANGELOG.md](DESIGN_CHANGELOG.md).
+The Curiosity Lab redesign adds a distinctive, interactive public landing page at `/` and a tactile scientific workspace at `/studio`. Its warm-paper, ink, electric-blue, coral, and citron system frames the existing deterministic physics rather than replacing it. Physics is the one open lab; four additional subjects are honestly labeled previews. Inter and Instrument Serif are hosted locally, canonical equations use native MathML, and the physics canvas has dedicated desktop/mobile layouts. The backend, secure Gemini configuration, Demo workflow, Voice Tutor, and Red Pen Challenge are preserved. Design decisions are recorded in [DESIGN_CHANGELOG.md](DESIGN_CHANGELOG.md).
 
 ## What you can do
 
@@ -19,7 +19,7 @@ The Learning Atelier redesign adds an interactive public landing page at `/` and
 - Upload text-based lecture PDFs, choose a detected supported topic, and inspect page-numbered source excerpts.
 - Reopen recent lessons stored in local SQLite. A browser session ID in local storage connects the browser to its lessons.
 - Listen to explanations when the browser provides speech synthesis.
-- Use the step-level **Voice Tutor** to listen, pause, resume, replay, or stop narration while the animation stays interactive. Speed and installed-browser voice preferences are remembered locally.
+- Press **Teach me** for one guided player that coordinates narration, visual cues, captions, scene progression, pause/resume, replay, and completion. Speed and installed-browser voice preferences are remembered locally.
 - Open the optional **Red Pen Challenge** inside a projectile lesson, spot one verified misconception, and use the same SVG physics engine to see the correction.
 
 ## Technology and scope
@@ -78,7 +78,7 @@ In a second PowerShell terminal, from the same project root, run the frontend.
 powershell -ExecutionPolicy Bypass -File .\scripts\start-frontend.ps1
 ```
 
-Open the [landing page](http://127.0.0.1:3000) and click **Start Learning**, or open the [learning studio](http://127.0.0.1:3000/studio) directly. The backend also provides [interactive API documentation](http://localhost:8000/docs) and a [health check](http://localhost:8000/health). Keep both terminals open. Press Ctrl+C in each terminal to stop its server.
+Open the [landing page](http://127.0.0.1:3000) and click **Start Exploring**, or open the [Curiosity Lab](http://127.0.0.1:3000/studio) directly. The backend also provides [interactive API documentation](http://localhost:8000/docs) and a [health check](http://localhost:8000/health). Keep both terminals open. Press Ctrl+C in each terminal to stop its server.
 
 The equivalent commands, from the project root, are shown below. Run them in separate terminals.
 
@@ -164,9 +164,11 @@ The first visit to the studio opens a clearly labelled Demo lesson, or restores 
 
 Try “Why does a projectile travel farthest at 45 degrees?”, select the second step, and enter “I don't understand why 60 degrees doesn't travel farther.” Click **Explain it differently** to switch to velocity decomposition. The three-minute walkthrough and exact Windows startup commands are in [DEMO.md](DEMO.md).
 
-### Voice Tutor
+### Guided audiovisual lesson
 
-The lesson companion includes a reusable browser-based Voice Tutor for the currently displayed teaching step. It uses `window.speechSynthesis` only after the student selects **Listen**; it never autoplays, adds no Gemini request, creates no audio file, and requires no additional key. Changing steps, lessons, or pages cancels the previous utterance. Scientific notation and common units are converted to natural speech without changing the visible explanation. Voice availability and quality depend on the browser and operating system; unsupported browsers retain the full written lesson and animation.
+The visualization now contains one integrated **Guided Lesson** controller. Selecting **Teach me** begins a six-scene projectile lesson: launch components, ascent, gravity, apex, descent, and angle comparison. Each scene uses an allowlisted visualization, cue, highlight target, and verified parameter set. Speech completion—not an estimated text timer—advances to the next scene. Pause and resume control speech and visual motion together; Stop, Replay scene, Previous, Next, captions, narration, rate, and installed-browser voice controls share the same player.
+
+The guide uses `window.speechSynthesis` only after the student selects **Teach me**; it never autoplays, adds no Gemini request, creates no audio file, and requires no additional key. Stale callbacks are ignored, speech never overlaps, and lesson changes clean up narration. Changing a physics parameter explicitly returns to **Explore freely** so manual experimentation cannot silently corrupt guided state. Unsupported speech retains captions, scene navigation, the written lesson, and the real visualization. Only the three existing projectile topic routes have synchronized visual guides; unimplemented subjects remain clearly labeled previews.
 
 ### Red Pen Challenge
 
@@ -203,7 +205,7 @@ Playwright starts missing local servers and reuses servers already running on po
 
 To serve the built frontend, run `npm run start -- --hostname 127.0.0.1 --port 3000` from `frontend`, with the backend running in a separate terminal.
 
-Backend tests cover classification, demo generation, adaptation history, session ownership, optimistic concurrency, invalid input, PDF validation, mathematical relationships, Gemini errors, cache isolation/expiry/concurrency, and timing privacy. An HTTP mock transport exercises the installed official Gemini SDK's request serialization and structured lesson/adaptation responses. The default frontend suite contains 45 Chrome scenarios and eight pure physics/challenge-bank/speech checks. It covers the Demo journey, Voice Tutor lifecycle, Red Pen Challenge, landing navigation, PDFs, failures/loading, reduced motion, responsive controls, actual SVG strategy changes, live vector geometry, chapter selection, and accessibility. One additional real Gemini browser test is opt-in; it also verifies labeled plan reuse. See [TEST_REPORT.md](TEST_REPORT.md) for actual results and [STATUS.md](STATUS.md) for scope.
+Backend tests cover classification, demo generation, adaptation history, session ownership, optimistic concurrency, invalid input, PDF validation, mathematical relationships, Gemini errors, cache isolation/expiry/concurrency, and timing privacy. An HTTP mock transport exercises the installed official Gemini SDK's request serialization and structured lesson/adaptation responses. The default frontend suite contains 48 Chrome scenarios and nine pure physics/challenge-bank/speech/registry checks. It covers the Demo journey, synchronized Guided Lesson lifecycle and cue mapping, Red Pen Challenge, functional Curiosity Lab question routing, truthful subject previews, PDFs, failures/loading, reduced motion, responsive controls down to 320px, actual SVG strategy changes, live vector geometry, chapter selection, and accessibility. One additional real Gemini browser test is opt-in; it also verifies labeled plan reuse. See [TEST_REPORT.md](TEST_REPORT.md) for actual results and [STATUS.md](STATUS.md) for scope.
 
 ## Troubleshooting
 

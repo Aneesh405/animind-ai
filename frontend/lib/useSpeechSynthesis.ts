@@ -6,6 +6,11 @@ import { formatSpeechText } from "./speechText";
 export type SpeechState = "checking" | "unsupported" | "idle" | "speaking" | "paused" | "error";
 export type SpeechRate = "slower" | "normal" | "faster";
 
+interface SpeechLifecycle {
+  onEnd?: () => void;
+  onError?: () => void;
+}
+
 const RATE_VALUES: Record<SpeechRate, number> = {
   slower: 0.78,
   normal: 0.93,
@@ -23,7 +28,7 @@ function savedRate(): SpeechRate {
   return "normal";
 }
 
-export function useSpeechSynthesis(text: string, contentKey: string) {
+export function useSpeechSynthesis(text: string, contentKey: string, lifecycle: SpeechLifecycle = {}) {
   const [state, setState] = useState<SpeechState>("checking");
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [rate, setRateState] = useState<SpeechRate>("normal");
@@ -32,6 +37,8 @@ export function useSpeechSynthesis(text: string, contentKey: string) {
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const requestRef = useRef(0);
   const previousKeyRef = useRef(contentKey);
+  const lifecycleRef = useRef(lifecycle);
+  lifecycleRef.current = lifecycle;
 
   const stop = useCallback(() => {
     requestRef.current += 1;
@@ -110,12 +117,14 @@ export function useSpeechSynthesis(text: string, contentKey: string) {
       if (requestRef.current === request) {
         utteranceRef.current = null;
         setState("idle");
+        lifecycleRef.current.onEnd?.();
       }
     };
     utterance.onerror = (event) => {
       if (requestRef.current !== request) return;
       utteranceRef.current = null;
       setState(event.error === "canceled" || event.error === "interrupted" ? "idle" : "error");
+      if (event.error !== "canceled" && event.error !== "interrupted") lifecycleRef.current.onError?.();
     };
     utteranceRef.current = utterance;
     setState("speaking");

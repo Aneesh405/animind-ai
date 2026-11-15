@@ -1,10 +1,9 @@
 "use client";
 
-import { ArrowDown, ArrowRight, Check, ChevronRight, Lightbulb, Repeat2 } from "lucide-react";
+import { ArrowDown, ArrowRight, Check, ChevronRight, Lightbulb, Repeat2, Volume2 } from "lucide-react";
 import Equation from "../Equation";
 import type { StudioState } from "../../lib/useLearningStudio";
 import { visualEvidence } from "../../lib/walkthrough";
-import VoiceTutorControls from "./VoiceTutorControls";
 
 export default function LessonCompanion({ studio: s }: { studio: StudioState }) {
   const lesson = s.lesson;
@@ -21,11 +20,7 @@ export default function LessonCompanion({ studio: s }: { studio: StudioState }) 
       <div className="selected-explanation" key={s.selectedStep?.id || lesson.scene}>
         <span className="small-label">{s.selectedStep ? `A CLOSER LOOK · STEP ${s.selectedIndex + 1}` : "THE IDEA TO NOTICE"}</span>
         <p>{visibleStep.text}</p>
-        <VoiceTutorControls
-          text={`${visibleStep.title}. ${visibleStep.text}`}
-          contentKey={`${lesson.id}:${lesson.revision}:${lesson.scene}:${visibleStep.id}`}
-          stepLabel={`step ${s.selectedStep ? s.selectedIndex + 1 : Math.min(s.activeStage, lesson.steps.length - 1) + 1}`}
-        />
+        <p className="guided-location-note"><Volume2 size={14} aria-hidden="true" />Narration now follows the active visual inside the Guided Lesson player.</p>
         <Equation equationKey={visibleStep.equation_key} />
       </div>
 

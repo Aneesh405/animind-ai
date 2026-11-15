@@ -4,7 +4,7 @@ import AxeBuilder from "@axe-core/playwright";
 
 test("landing navigation opens the real studio and restores notebook lessons", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Some things make more sense when you see them.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Big ideas\.\s*Made visible\./);
   await page.getByRole("link", { name: "How It Works", exact: true }).click();
   await expect(page).toHaveURL(/#how-it-works$/);
   await expect(page.getByRole("heading", { name: "Ask a question.", exact: true })).toBeInViewport();
@@ -23,6 +23,20 @@ test("landing navigation opens the real studio and restores notebook lessons", a
   await expect(page).toHaveURL(/\/studio\?question=/);
   await expect(page.getByTestId("lesson-scene")).toHaveAttribute("data-scene", "components");
   await expect(page.getByLabel("What would you like to understand?")).toHaveValue("How do horizontal and vertical velocity components affect a projectile?");
+});
+
+test("Curiosity Lab question console and subject discovery stay truthful and functional", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Five doors. One open lab." })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Physics Motion you can touch/ })).toBeVisible();
+  await expect(page.getByText("PREVIEW", { exact: true })).toHaveCount(4);
+  await expect(page.getByText("Explanation preview · visual lab coming later.", { exact: true })).toHaveCount(4);
+  const question = "How do horizontal and vertical velocity components affect a projectile?";
+  await page.getByLabel("What have you always wanted to understand?").fill(question);
+  await page.getByRole("button", { name: "Make it visible" }).click();
+  await expect(page).toHaveURL(/\/studio\?question=/);
+  await expect(page.getByLabel("What would you like to understand?")).toHaveValue(question);
+  await expect(page.getByTestId("lesson-scene")).toHaveAttribute("data-scene", "components");
 });
 
 test("landing experiment has correct angle relationships, comparison, and playback", async ({ page }) => {

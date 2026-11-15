@@ -12,7 +12,7 @@ export default function StudioNavigation({ studio: s }: { studio: StudioState })
   return (
     <header className="studio-topbar">
       <Brand />
-      <span className="studio-location"><span />The learning atelier <span className="location-divider">/</span> <strong>Studio</strong></span>
+      <span className="studio-location"><span />The Curiosity Lab <span className="location-divider">/</span> <strong>Physics 01</strong></span>
       <nav className="studio-navigation" aria-label="Learning navigation">
         <span className={`engine-status ${s.health ? "online" : ""}`}><i />{s.health ? "Engine connected" : "Connecting"}</span>
         <label className="mode-selector">

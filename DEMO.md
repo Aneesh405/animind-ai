@@ -50,9 +50,9 @@ Confusion:
 
 Gemini may start with trajectories, velocity decomposition, or range-comparison bars. Each is a valid result. Adaptation must change the current representation; the banner and actual diagram show the difference. The demonstration does not depend on a fixed model-generated title or answer order.
 
-## Voice Tutor
+## Guided audiovisual lesson
 
-In **Your Learning Companion**, choose a lesson step and select **Listen** in its Voice Tutor panel. While narration is active, demonstrate **Pause**, **Resume**, **Replay**, and **Stop**; the projectile controls remain interactive throughout. Voice settings offer Slower, Normal, and Faster rates plus only the voices installed in the current browser. Narration is browser-local, never autoplays, and makes no Gemini request. If speech synthesis is unavailable, the written explanation and animation continue normally.
+Inside the main visualization, select **Teach me** once. Animind moves through launch, ascent, gravity, apex, descent, and angle comparison while the browser narrates exactly the active visual scene. Demonstrate **Pause**, **Resume**, **Replay scene**, **Previous**, **Next**, captions, and narration controls. Voice settings offer Slower, Normal, and Faster rates plus only the voices installed in the current browser. Change a slider to show the explicit return to **Explore freely**, then select **Teach me** to restart the guide using the new verified parameters. Narration is browser-local, never autoplays, and makes no Gemini request. If speech synthesis is unavailable, captions, manual scene navigation, the written explanation, and animation continue normally.
 
 ## Optional Red Pen Challenge
 

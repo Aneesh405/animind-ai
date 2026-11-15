@@ -1,5 +1,28 @@
 # Animind AI - performance and animated teaching verification
 
+## Synchronized audiovisual teaching engine — November 15, 2026
+
+Animind now coordinates browser narration and the real projectile visualization through one Guided Lesson controller. Six deterministic scenes cover launch components, ascent, gravity, apex, descent, and angle comparison. Model output cannot create cues: the registry accepts only existing projectile topic IDs, existing scene components, six cue values, and six highlight targets. Speech lifecycle events advance the guide; visual motion holds when it finishes early and never estimates narration length.
+
+Final verification: **98 backend tests passed** with one upstream deprecation warning; TypeScript passed; **8 guided speech/registry tests** passed; **22 combined QA, teaching, and guided-player tests** passed; **15 responsive redesign/browser tests** passed; and the complete default frontend suite finished with **57 passed, one explicitly opt-in live-Gemini test skipped, and zero failed** in 6.9 minutes. The production build passed and prerendered `/`, `/studio`, `/icon.svg`, and the not-found route.
+
+Automated speech uses a deterministic Web Speech API mock, so lifecycle and coordination are verified without claiming headless Chrome produced audible sound. Actual speaker output, pronunciation, OS voice quality, word-boundary timing, non-Chromium browsers, and physical mobile devices remain manual checks. Synchronization is intentionally scene-level; exact word-level timing is not claimed.
+
+## Curiosity Lab signature redesign verification — November 15, 2026
+
+The existing application was visually redesigned without changing its backend contracts or replacing its deterministic physics. The landing question console routes into the real workspace, Physics is clearly the only open lab, and four subject cards are explicitly previews. Demo/Gemini selection, lesson generation, animation controls, parameters, adaptive explanations, checks, PDFs, Voice Tutor, and Red Pen Challenge remain in place.
+
+| Verification | Result |
+| --- | --- |
+| Complete backend suite | **98 passed**, 0 failed; one upstream deprecation warning |
+| Frontend type check | **Passed** |
+| Targeted redesign/browser suite | **15 passed**, including both routes at 1440, 1280, 768, and 390px, axe scans, reduced motion, routing, and failure states |
+| 320px regression | **Passed** after containing the selected-step MathML equation |
+| Complete default frontend suite | **54 passed, 1 skipped, 0 failed** in 3.5 minutes; the skip is the explicitly opt-in real-Gemini browser workflow |
+| Production build | **Passed**; `/`, `/studio`, `/icon.svg`, and the not-found route were prerendered |
+
+Visual review covered desktop and 390px mobile screenshots for both landing and studio. No generated bitmap artwork or third-party design system was introduced. The real Gemini browser scenario remains explicitly opt-in because it consumes provider quota; this redesign does not alter that integration. Manual audible speech quality, Firefox/Safari, physical mobile devices, and a screen-reader session were not tested.
+
 ## Voice Tutor verification - November 15, 2026
 
 The step-level **Voice Tutor** was implemented on local branch `feature/voice-tutor`. It uses the browser's `SpeechSynthesis` API and adds no backend request, Gemini request, API key, audio file, or dependency. Narration is opt-in and tied to the actual displayed lesson step. Step changes, lesson changes, navigation, component unmount, replay, preference changes, and cancellation all stop the prior utterance.
