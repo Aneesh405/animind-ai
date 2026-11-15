@@ -20,7 +20,7 @@ const editorial = localFont({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "Animind AI — Big Ideas, Made Visible",
+  title: "AniMind — Big Ideas, Made Visible",
   description:
     "Ask the question. Play with the concept. Watch understanding click through verified interactive physics and adaptive visual explanations.",
 };

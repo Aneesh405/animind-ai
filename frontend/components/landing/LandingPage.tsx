@@ -28,7 +28,7 @@ export default function LandingPage() {
           <p>Ask the question. Play with the concept. Watch understanding click.</p>
           <form className="hero-question" action="/studio"><label htmlFor="hero-question">What have you always wanted to understand?</label><div><input id="hero-question" name="question" defaultValue="Why does a projectile travel farthest at 45 degrees?" /><button type="submit">Make it visible<ArrowRight size={17} /></button></div><small><CornerDownLeft size={12} />Press Enter to open a real visual lesson</small></form>
           <div className="hero-prompts" aria-label="Example questions"><span>TRY ONE</span>{explorations.slice(0, 2).map((item) => <Link key={item.number} href={`/studio?question=${encodeURIComponent(item.question)}`}>{item.title}<ArrowUpRight size={12} /></Link>)}</div>
-          <div className="hero-actions"><Link href="/studio" className="primary-button">Start Exploring<ArrowRight size={17} /></Link><a href="#in-action" className="action-link"><span><Play size={11} fill="currentColor" /></span>See Animind in Action</a></div>
+          <div className="hero-actions"><Link href="/studio" className="primary-button">Start Exploring<ArrowRight size={17} /></Link><a href="#in-action" className="action-link"><span><Play size={11} fill="currentColor" /></span>See AniMind in Action</a></div>
         </div>
         <HeroExperiment />
       </section>
@@ -48,7 +48,7 @@ export default function LandingPage() {
       </section>
 
       <section className="perspective-section" id="in-action" aria-labelledby="different-heading">
-        <div className="perspective-title"><div><span className="section-number">04 <span>/ THE MOMENT IT CLICKS</span></span><h2 id="different-heading">Find <em>another way.</em></h2></div><p>Still confused? Animind changes the visual explanation, not just the words. Select a lesson step, tell us where you&apos;re stuck, and see the concept from a new angle.</p></div>
+        <div className="perspective-title"><div><span className="section-number">04 <span>/ THE MOMENT IT CLICKS</span></span><h2 id="different-heading">Find <em>another way.</em></h2></div><p>Still confused? AniMind changes the visual explanation, not just the words. Select a lesson step, tell us where you&apos;re stuck, and see the concept from a new angle.</p></div>
         <PerspectivePreview />
       </section>
 

@@ -35,7 +35,7 @@ export default function LearningStudio({initial}: {initial?: {question: string; 
           <div className="lesson-layout" aria-busy={Boolean(busy)}>
             <section className="visual-column" id="lesson-visual" aria-label="Interactive visual lesson">
               <div className="visual-caption"><span><span className="caption-index">LIVE EXHIBIT 01</span>{lesson.title}</span><span>TOUCH THE PHYSICS</span></div>
-              <GuidedLessonPlayer key={`${lesson.id}:${lesson.revision}`} lesson={lesson} parameters={studio.parameters} focusIndex={studio.selectedIndex >= 0 ? studio.selectedIndex : null} focusVersion={studio.focusVersion} onStageChange={studio.setActiveStage} onExplore={() => studio.setSelectedStepId(null)} />
+              <GuidedLessonPlayer key={lesson.id} lesson={lesson} parameters={studio.parameters} focusIndex={studio.selectedIndex >= 0 ? studio.selectedIndex : null} focusVersion={studio.focusVersion} onStageChange={studio.setActiveStage} onExplore={() => studio.setSelectedStepId(null)} />
               <CalculatedResults studio={studio} />
             </section>
             <LessonCompanion studio={studio} />
@@ -47,7 +47,7 @@ export default function LearningStudio({initial}: {initial?: {question: string; 
           <RedPenChallenge parameters={studio.parameters} disabled={Boolean(busy)} />
           <section className="followups" aria-label="Suggested questions"><span className="eyebrow">CURIOSITY DOESN&apos;T STOP HERE</span>{lesson.suggested_questions.map((suggestion) => <button key={suggestion} disabled={Boolean(busy)} onClick={() => void studio.generate(suggestion)}>{suggestion}<ArrowRight size={14} /></button>)}</section>
         </> : busy ? <section className="lesson-pending" aria-label="Lesson workspace preparing"><div className="pending-canvas"><Compass size={36} strokeWidth={1} /><h2>Preparing your visual lesson</h2><p>The animation will open after the topic and teaching plan are validated.</p></div><div className="pending-notes"><span className="eyebrow">YOUR LEARNING COMPANION</span><p>Knowns → components → equations → motion → calculation → meaning</p><small>For ideal, equal-height projectile motion.</small></div></section> : <section className="empty-state"><Compass size={42} strokeWidth={1} /><h2>A question can change<br />the way you <em>see.</em></h2><p>Start with projectile motion. Discover the connection between direction, time, and distance.</p><button className="primary-button" disabled={!studio.sessionId} onClick={() => void studio.generate(INITIAL_QUESTION)}>Explore why 45° goes farthest<ArrowRight size={16} /></button><small>Ideal projectile motion · velocity components · launch angles</small></section>}
-        <footer className="workspace-footer"><span>Animind AI <span>·</span> Don&apos;t Just Learn It. See It.</span><span>The Curiosity Lab · Physics 01</span></footer>
+        <footer className="workspace-footer"><span>AniMind <span>·</span> Don&apos;t Just Learn It. See It.</span><span>The Curiosity Lab · Physics 01</span></footer>
       </main>
     </div>
   );

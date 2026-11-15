@@ -17,7 +17,7 @@ test("landing navigation opens the real studio and restores notebook lessons", a
   await page.locator(".recent-item").first().click();
   await expect(page.getByTestId("lesson-scene")).toBeVisible();
   await expect(page.locator(".notebook-menu")).not.toHaveAttribute("open");
-  await page.getByRole("link", { name: "Animind AI home" }).click();
+  await page.getByRole("link", { name: "AniMind home" }).click();
   await expect(page).toHaveURL("http://localhost:3000/");
   await page.getByRole("link", { name: /One velocity, two directions/ }).click();
   await expect(page).toHaveURL(/\/studio\?question=/);
@@ -68,7 +68,7 @@ test("landing teaching preview changes SVG and clearly labels its provenance", a
   const teachingRequests: string[] = [];
   page.on("request", (request) => { if (/\/api\/(lesson|adapt)$/.test(request.url())) teachingRequests.push(request.url()); });
   await page.goto("/");
-  await page.getByRole("link", { name: "See Animind in Action", exact: true }).click();
+  await page.getByRole("link", { name: "See AniMind in Action", exact: true }).click();
   const preview = page.locator(".perspective-preview");
   await expect(preview.getByText("Interactive preview · no AI request", { exact: true })).toBeVisible();
   await expect(preview.getByTestId("lesson-scene")).toHaveAttribute("data-scene", "trajectories");

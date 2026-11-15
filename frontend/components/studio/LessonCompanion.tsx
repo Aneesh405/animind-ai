@@ -26,7 +26,7 @@ export default function LessonCompanion({ studio: s }: { studio: StudioState }) 
 
       <section className="confusion-panel" aria-labelledby="different-heading">
         <div className="confusion-heading"><Repeat2 size={18} /><h2 id="different-heading">A different way to see it.</h2></div>
-        <p>Tell Animind what&apos;s confusing. We&apos;ll find another way to show it.</p>
+        <p>Tell AniMind what&apos;s confusing. We&apos;ll find another way to show it.</p>
         {s.selectedStep ? <form onSubmit={(e) => { e.preventDefault(); void s.adapt(); }}>
           <label htmlFor="confusion">What feels unclear about step {s.selectedIndex + 1}?</label>
           <textarea ref={s.confusionInput} id="confusion" rows={3} value={s.confusion} maxLength={1500} placeholder="Why doesn't 60° travel farther if it stays in the air longer?" onChange={(e) => s.setConfusion(e.target.value)} />

@@ -82,7 +82,7 @@ test("complete Red Pen journey retries gently and proves all three corrections w
   await openChallenge(page);
   const panel = challengePanel(page);
   await expect(panel.getByRole("heading", { name: "The AI made a mistake. Can you catch it?" })).toBeVisible();
-  await expect(panel).toContainText("Regular Animind lessons remain scientifically verified.");
+  await expect(panel).toContainText("Regular AniMind lessons remain scientifically verified.");
   await expect(panel).toContainText("Challenge 1 of 3");
   await expect(panel.getByRole("radio")).toHaveCount(3);
   await expect(panel.getByRole("button", { name: "Check Answer" })).toBeDisabled();

@@ -14,9 +14,9 @@ export function BrandMark({ className = "" }: { className?: string }) {
 
 export default function Brand() {
   return (
-    <Link className="brand" href="/" aria-label="Animind AI home">
+    <Link className="brand" href="/" aria-label="AniMind home">
       <BrandMark />
-      <span>animind<span className="brand-ai">AI</span></span>
+      <span>AniMind</span>
     </Link>
   );
 }

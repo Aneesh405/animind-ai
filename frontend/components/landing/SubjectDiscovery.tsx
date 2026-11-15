@@ -22,7 +22,7 @@ function SubjectMotif({ kind }: { kind: string }) {
 
 export default function SubjectDiscovery() {
   return <section className="subject-section" id="subjects" aria-labelledby="subjects-heading">
-    <header className="subject-heading"><div><span className="section-number">02 <span>/ CHOOSE YOUR CURIOSITY</span></span><h2 id="subjects-heading">Five doors.<br /><em>One open lab.</em></h2></div><p>Physics is interactive today. The other rooms show where Animind can grow—without pretending those visualizers are already built.</p></header>
+    <header className="subject-heading"><div><span className="section-number">02 <span>/ CHOOSE YOUR CURIOSITY</span></span><h2 id="subjects-heading">Five doors.<br /><em>One open lab.</em></h2></div><p>Physics is interactive today. The other rooms show where AniMind can grow—without pretending those visualizers are already built.</p></header>
     <div className="subject-grid">{subjects.map((subject) => {
       const content = <><div className="subject-card-top"><span>{subject.number}</span>{subject.available ? <span className="subject-status live"><i />LIVE LAB</span> : <span className="subject-status"><LockKeyhole size={11} />PREVIEW</span>}</div><SubjectMotif kind={subject.key} /><div className="subject-card-copy"><h3>{subject.name}</h3><strong>{subject.line}</strong><p>{subject.detail}</p></div>{subject.available && <span className="subject-action">Enter the lab<ArrowUpRight size={16} /></span>}</>;
       return subject.available
