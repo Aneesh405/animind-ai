@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: animind-api
+    runtime: python
+    plan: free
+    region: virginia
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      # Render's current default is newer than the version exercised in CI.
+      - key: PYTHON_VERSION
+        value: 3.12.11
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false
+      # Render's filesystem is ephemeral. Sessions survive normal requests but
+      # recent lessons and extracted PDF text reset when the instance restarts.
+      - key: ANIMIND_DB_PATH
+        value: /tmp/animind.sqlite3
