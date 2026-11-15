@@ -1,0 +1,25 @@
+.env*
+!.env.example
+!.env.local.example
+node_modules/
+.next/
+__pycache__/
+.venv/
+*.pyc
+backend/data/
+.pytest_cache/
+*.tsbuildinfo
+frontend/playwright-report/
+frontend/test-results/
+frontend/design-review/
+*.log
+
+# Local credentials and private key material
+*.pem
+*.key
+*.p12
+*.pfx
+.ssh/
+.secrets/
+credentials*.json
+*service-account*.json
