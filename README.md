@@ -36,7 +36,9 @@ The supported physics assumes equal launch and landing heights, constant downwar
 | Horizontal range | `R = v0² sin(2 theta) / g = vx T` |
 | Maximum height | `H = v0² sin²(theta) / (2 g)` |
 
-Angles are supported from 0–90°, speed from 1–100 m/s, and gravity from 0.1–50 m/s². A horizontal launch from ground level has zero flight time in this model. Vector arrows represent the initial velocity at launch. Trajectories share the same elapsed physical time and remain at their landing position after landing. Chart axes fit the displayed trajectories and are labelled in metres.
+Angles are supported from 0–90°, speed from 1–100 m/s, and gravity from 0.1–50 m/s². A horizontal launch from ground level has zero flight time in this model. During flight, horizontal velocity stays constant and vertical velocity follows `vy = vy0 - gt`. The component view attaches those arrows to the moving projectile and shows downward gravity. Its equal spatial scales preserve the vector direction. Trajectories share the same elapsed physical time and remain at their landing position after landing; velocity arrows stop at landing because a collision is outside this model.
+
+The studio now guides six visual chapters: knowns and goal, components, equation choice, motion, calculation, and physical meaning. The timeline includes this reasoning sequence; elapsed physical time advances in the Motion chapter. It stops on the conclusion. Choose a chapter to inspect it or replay the sequence. The tutor's three to five generated explanation steps remain separate and seek the relevant visual by equation meaning. Each step names the evidence to inspect. Reduced motion pauses automatic playback; explicit Play remains available.
 
 ## Windows setup
 
@@ -140,6 +142,20 @@ Credentials stay on the backend. Environment files are ignored by Git. The front
 
 Gemini requests have a 20-second request timeout and at most two attempts for transient gateway errors. Invalid credentials, malformed structured requests, unavailable models, and rate limits receive distinct errors. Malformed plans, unknown scene types, invalid parameters, and repeated adaptive strategies are rejected. The structured request uses `response_json_schema`, preserving strict JSON Schema validation without sending unsupported native-schema properties. Actual live API and browser results are recorded in [TEST_REPORT.md](TEST_REPORT.md).
 
+For `gemini-3.8-flash`, lesson and adaptation planning use the supported **low** thinking level and concise-step guidance to reduce response latency. The model and key remain unchanged. Strict validation, verified physics, and the 6,000-token output allowance are retained so complete structured responses can be validated. Other configured models retain their previous generation settings. Google's service latency still varies between requests.
+
+## Planning performance
+
+Visuals are calculated locally in React/SVG; no video-generation service is involved. A lesson needs one Gemini call on a cache miss. Identical initial requests within the same browser session can reuse a validated plan for five minutes. The RAM cache holds at most 64 plans, separates sessions, binds the full request and provider configuration, and combines concurrent identical requests. Each request still creates a new lesson and recalculates physics. The UI labels reuse as **Saved Gemini plan**. PDF lessons and adaptive explanations bypass this cache. A restart clears it; failures are never cached. Optional health refreshes no longer keep a completed lesson busy.
+
+For safe local phase timings, start the backend with the opt-in development switch:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-backend.ps1 -DevTiming
+```
+
+Inspect the lesson response's `Server-Timing` header in browser developer tools for fixed phase names and milliseconds. Development frontend performance entries use fixed `animind:lesson-request` and `animind:lesson-decode` labels. These diagnostics contain no prompts, document excerpts, session identifiers, or credentials. Normal backend startup omits timing headers; the production frontend omits these performance entries. See [TEST_REPORT.md](TEST_REPORT.md) for measured results and their limits.
+
 ## Demo mode
 
 The first visit to the studio opens a clearly labelled Demo lesson, or restores the browser session's latest lesson. Demo mode uses curated teaching plans, predefined tentative misconception hypotheses, and deterministic physics. It demonstrates the entire adaptive workflow without Gemini credentials. The numerical simulation and what-if calculations remain interactive. The public landing page uses local deterministic experiments, and its teaching preview explicitly says no AI request is made.
@@ -177,7 +193,7 @@ Playwright starts missing local servers and reuses servers already running on po
 
 To serve the built frontend, run `npm run start -- --hostname 127.0.0.1 --port 3000` from `frontend`, with the backend running in a separate terminal.
 
-Backend tests cover classification, demo generation, adaptation history, session ownership, optimistic concurrency, invalid input, PDF validation, mathematical relationships, and Gemini errors. An HTTP mock transport exercises the installed official Gemini SDK’s request serialization and structured lesson/adaptation responses. The 29 default browser scenarios cover the complete Demo journey, landing navigation, hero physics, PDF references, unsupported questions, error/loading states, reduced motion, responsive controls, actual SVG strategy changes, and accessibility. The additional real Gemini test is opt-in. See [TEST_REPORT.md](TEST_REPORT.md) for actual results and [STATUS.md](STATUS.md) for scope.
+Backend tests cover classification, demo generation, adaptation history, session ownership, optimistic concurrency, invalid input, PDF validation, mathematical relationships, Gemini errors, cache isolation/expiry/concurrency, and timing privacy. An HTTP mock transport exercises the installed official Gemini SDK's request serialization and structured lesson/adaptation responses. The default frontend suite contains 38 Chrome scenarios and five pure physics/synchronization checks. It covers the Demo journey, landing navigation, PDFs, failures/loading, reduced motion, responsive controls, actual SVG strategy changes, live vector geometry, chapter selection, and accessibility. One additional real Gemini browser test is opt-in; it also verifies labeled plan reuse. See [TEST_REPORT.md](TEST_REPORT.md) for actual results and [STATUS.md](STATUS.md) for scope.
 
 ## Troubleshooting
 

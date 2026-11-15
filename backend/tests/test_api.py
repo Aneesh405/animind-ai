@@ -130,16 +130,32 @@ def test_gemini_sdk_schema_integration(client, session, monkeypatch):
     assert generate.call_args.kwargs["model"] == "configured-test-model"
     assert generate.call_args.kwargs["config"].response_json_schema == main.TeachingPlan.model_json_schema()
     assert generate.call_args.kwargs["config"].response_schema is None
+    assert generate.call_args.kwargs["config"].thinking_config is None
+    assert generate.call_args.kwargs["config"].temperature == 0.25
+
+
+@pytest.mark.parametrize("model", ["gemini-3.8-flash", "models/gemini-3.8-flash"])
+def test_flash_38_uses_supported_low_latency_configuration(client, session, monkeypatch, model):
+    generate = mock_gemini(monkeypatch, demo_plan().model_dump_json())
+    monkeypatch.setenv("GEMINI_MODEL", model)
+    response = make_lesson(client, session, mode="gemini")
+    assert response.status_code == 200
+    config = generate.call_args.kwargs["config"]
+    assert config.thinking_config.thinking_level.value == "LOW"
+    assert config.thinking_config.thinking_budget is None
+    assert config.temperature is None
+    assert config.max_output_tokens == 6000
 
 
 def test_real_sdk_serializes_lesson_and_adaptive_schemas(client, session, monkeypatch):
     """Exercise the installed SDK and HTTP payload through a local mock transport."""
     import httpx
     from google import genai
+    from google.genai import types
     from teaching import demo_adaptation
 
     monkeypatch.setenv("GEMINI_API_KEY", "local-transport-test")
-    monkeypatch.setenv("GEMINI_MODEL", "configured-test-model")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-3.8-flash")
     original_client = genai.Client
     requests = []
     output = [demo_plan().model_dump_json()]
@@ -164,6 +180,10 @@ def test_real_sdk_serializes_lesson_and_adaptive_schemas(client, session, monkey
     assert response.json()["scene"] == "components"
     assert requests[0]["generationConfig"]["responseMimeType"] == "application/json"
     for request, schema in zip(requests, [main.TeachingPlan, main.AdaptivePlan], strict=True):
+        thinking = types.ThinkingConfig.model_validate(request["generationConfig"]["thinkingConfig"])
+        assert thinking.thinking_level == types.ThinkingLevel.LOW
+        assert thinking.thinking_budget is None
+        assert "temperature" not in request["generationConfig"]
         assert "responseSchema" not in request["generationConfig"]
         wire_schema = request["generationConfig"]["responseJsonSchema"]
         assert wire_schema == schema.model_json_schema()

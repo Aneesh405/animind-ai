@@ -127,6 +127,7 @@ class Lesson(StrictModel):
     verification: Verification
     suggested_questions: list[str]
     mode: Mode
+    planning_source: Literal["demo", "gemini", "gemini_cache"] | None = None
     strategy_history: list[SceneType]
     adaptation: Adaptation | None = None
     understanding_check: UnderstandingCheck

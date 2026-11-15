@@ -66,11 +66,11 @@ test("complete adaptive student journey with verified what-if results", async ({
   await page.getByRole("button", { name: "Explain it differently" }).click();
   await expect(scene).toHaveAttribute("data-scene", "components");
   await expect(page.getByTestId("adaptation-banner")).toContainText(
-    "Velocity decomposition",
+    "Velocity components in flight",
   );
   await expect(page.getByText("Predefined demo hypothesis")).toBeVisible();
   await expect(
-    scene.getByRole("img", { name: /Initial velocity decomposition/ }),
+    scene.getByRole("img", { name: /Velocity components during projectile flight/ }),
   ).toBeVisible();
 
   const update = page.waitForResponse(

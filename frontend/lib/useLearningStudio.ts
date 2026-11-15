@@ -20,6 +20,8 @@ export function useLearningStudio() {
   const [error, setError] = useState("");
   const [document, setDocument] = useState<PDFDocument | null>(null);
   const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
+  const [focusVersion, setFocusVersion] = useState(0);
+  function selectStep(id: string) { setSelectedStepId(id); setFocusVersion(value => value + 1); }
   const [activeStage, setActiveStage] = useState(0);
   const [confusion, setConfusion] = useState("");
   const [whatIf, setWhatIf] = useState("");
@@ -206,7 +208,8 @@ export function useLearningStudio() {
         });
         acceptLesson(next);
         resetInteraction();
-        setHealth(await api<Health>("/health"));
+        // Optional status refresh must not hold the completed lesson behind a request.
+        void api<Health>("/health").then(setHealth).catch(() => {});
       },
     );
   }
@@ -336,7 +339,7 @@ export function useLearningStudio() {
       setSpeaking(false);
       return;
     }
-    const selected = lesson.steps.find((step) => step.id === selectedStepId);
+    const selected = lesson.steps.find((step) => step.id === selectedStepId) || lesson.steps[activeStage];
     const utterance = new SpeechSynthesisUtterance(
       selected
         ? `${selected.title}. ${selected.text}`
@@ -367,7 +370,7 @@ export function useLearningStudio() {
   return {
     sessionId, lesson, question, setQuestion, mode, setMode, parameters, recent,
     topics, health, busy, error, setError, document, setDocument, selectedStepId,
-    setSelectedStepId, activeStage, setActiveStage, confusion, setConfusion,
+    setSelectedStepId, selectStep, focusVersion, activeStage, setActiveStage, confusion, setConfusion,
     whatIf, setWhatIf, whatIfResult, answer, setAnswer, checkResult, setCheckResult,
     speaking, speechAvailable, fileInput, questionInput, confusionInput,
     selectedIndex, selectedStep, metrics, isPreview,

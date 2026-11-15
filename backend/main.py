@@ -5,6 +5,7 @@ import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
+from time import perf_counter
 from uuid import UUID, uuid4
 
 from dotenv import dotenv_values, load_dotenv
@@ -22,6 +23,9 @@ from schemas import (
 )
 from store import Store
 from teaching import CHECKS, demo_adaptation, demo_plan, generate_plan, next_strategies, understanding_check
+from timing import measurements, span
+from plan_cache import PlanCache, plan_key
+from teaching import SYSTEM_INSTRUCTION
 
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
@@ -29,8 +33,25 @@ app = FastAPI(title="Animind AI", version="1.0.0", description="Adaptive visual 
 origins = [origin.strip() for origin in os.getenv("FRONTEND_ORIGIN", "http://localhost:3000").split(",") if origin.strip()]
 if "http://localhost:3000" in origins:
     origins.append("http://127.0.0.1:3000")
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=False, allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=False, allow_methods=["GET", "POST"], allow_headers=["Content-Type"], expose_headers=["Server-Timing"])
 store = Store(os.getenv("ANIMIND_DB_PATH", str(BASE_DIR / "data" / "animind.sqlite3")))
+plan_cache = PlanCache()
+
+
+@app.middleware("http")
+async def development_timing(request, call_next):
+    if os.getenv("ANIMIND_DEV_TIMING") != "1":
+        return await call_next(request)
+    values = {}
+    token = measurements.set(values)
+    started = perf_counter()
+    try:
+        response = await call_next(request)
+        values["total"] = (perf_counter() - started) * 1000
+        response.headers["Server-Timing"] = ", ".join(f"{name};dur={duration:.2f}" for name, duration in values.items())
+        return response
+    finally:
+        measurements.reset(token)
 
 
 @app.exception_handler(RequestValidationError)
@@ -75,37 +96,53 @@ def supported_topics():
 @app.post("/lesson", response_model=Lesson, include_in_schema=False)
 @app.post("/api/lesson", response_model=Lesson)
 def create_lesson(request: LessonRequest):
-    topic = detect_topic(request.question)
+    with span("topic"):
+        topic = detect_topic(request.question)
     sources = []
     if request.document_id:
-        document = store.get_document(request.document_id, request.session_id)
+        with span("sources"):
+            document = store.get_document(request.document_id, request.session_id)
         topic = request.topic or topic
         if topic not in document["topics"]:
             raise HTTPException(422, "That supported topic wasn't identified in this PDF. Select a detected topic or ask a question without a document.")
-        sources = relevant_sources(document, topic)
+        with span("sources"):
+            sources = relevant_sources(document, topic)
         if not sources:
             raise HTTPException(422, "No relevant excerpt was found for this topic.")
     elif request.topic and request.topic != topic:
         raise HTTPException(422, "The selected topic and question don't match.")
     scene = {"projectile_motion": "trajectories", "launch_angles": "trajectories", "velocity_components": "components"}[topic]
+    with span("physics"):
+        metrics = calculate(request.parameters)
+        comparison_metrics = comparisons(request.parameters)
+    planning_source = "demo"
     if request.mode == "demo":
         plan = demo_plan(scene)
     else:
-        plan = generate_plan(TeachingPlan, {
+        context = {
             "task": "initial_lesson", "topic": topic, "question": request.question,
-            "parameters": request.parameters.model_dump(), "verified_metrics": calculate(request.parameters).model_dump(),
+            "parameters": request.parameters.model_dump(), "verified_metrics": metrics.model_dump(),
             "assumptions": ASSUMPTIONS, "pdf_excerpts": [source.model_dump() for source in sources],
-        })
+        }
+        if sources:
+            # Uploaded material is deliberately excluded from the reusable plan cache.
+            plan, cached = generate_plan(TeachingPlan, context), False
+        else:
+            key = plan_key(request.session_id, context, os.getenv("GEMINI_MODEL", ""),
+                           os.getenv("GEMINI_API_KEY", ""), SYSTEM_INSTRUCTION, TeachingPlan.model_json_schema())
+            plan, cached = plan_cache.get_or_create(key, lambda: generate_plan(TeachingPlan, context))
+        planning_source = "gemini_cache" if cached else "gemini"
     check = understanding_check("components" if topic == "velocity_components" else "tradeoff")
     lesson = Lesson(
         id=uuid4(), session_id=request.session_id, created_at=datetime.now(timezone.utc).isoformat(),
         topic=topic, title=plan.title, objective=plan.objective, student_question=request.question,
         explanation=plan.explanation, steps=render_steps(plan.steps, "step"), scene=plan.scene,
-        parameters=request.parameters, metrics=calculate(request.parameters), comparisons=comparisons(request.parameters),
+        parameters=request.parameters, metrics=metrics, comparisons=comparison_metrics,
         assumptions=ASSUMPTIONS, verification=Verification(), suggested_questions=plan.suggested_questions,
-        mode=request.mode, strategy_history=[plan.scene], understanding_check=check, sources=sources,
+        mode=request.mode, planning_source=planning_source, strategy_history=[plan.scene], understanding_check=check, sources=sources,
     )
-    return store.create_lesson(lesson)
+    with span("store"):
+        return store.create_lesson(lesson)
 
 
 @app.get("/api/lessons", response_model=list[LessonSummary])
@@ -152,6 +189,7 @@ def adapt(request: AdaptRequest):
         "scene": plan.new_strategy, "title": plan.title, "explanation": plan.explanation,
         "steps": render_steps(plan.steps, f"adapt-{lesson.revision}"), "adaptation": adaptation,
         "strategy_history": [*lesson.strategy_history, plan.new_strategy][-50:], "understanding_check": check,
+        "planning_source": "gemini" if lesson.mode == "gemini" else "demo",
     })
     return store.update_lesson(updated)
 

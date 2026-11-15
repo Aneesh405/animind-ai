@@ -1,9 +1,17 @@
 # Animind AI implementation status
 
+## Current performance and teaching follow-up
+
+The `feature/animated-teaching-performance` branch adds six synchronized visual chapters, moving velocity vectors with constant horizontal/changing vertical components and downward gravity, shared-time range bars, angle-comparison evidence, equation-linked tutor focus, truthful loading, nonblocking health refresh, and clearly labeled session-scoped validated-plan caching. Existing design, APIs, PDF and live Gemini workflows are preserved. Verification was completed locally before the separately authorized GitHub publication; consult the branch history for publication status.
+
+Current verification: **98 backend tests, 32 API checks, 39 Chrome scenarios, and five pure frontend physics/synchronization checks passed**. TypeScript and production build passed, as did a separate complete student journey using the built production frontend. Real Gemini lesson generation, cache provenance, adaptive SVG switching, understanding check, and reload persistence passed with clean runtime diagnostics. See [TEST_REPORT.md](TEST_REPORT.md) for exact measurements and remaining limits.
+
+The comparable uncached lesson measurements were 3.762 s before and 3.730 s after; this does not establish a first-request speedup. The final live workflow's identical cached repeat opened in 112 ms. New questions and adaptive explanations remain subject to cloud latency.
+
 ## Implemented
 
 - Next.js and React learning studio with responsive layouts and keyboard-labelled controls.
-- Animated projectile trajectories, initial velocity decomposition, and numerical range comparison.
+- Animated projectile trajectories, launch projections and live velocity vectors during flight, and distance-versus-airtime range comparison.
 - Playback, replay, timeline scrubbing, fullscreen, selectable steps, and step-linked animation stages.
 - Explicit Demo and Gemini lesson modes with separate provenance labels.
 - Structured Gemini teaching and adaptation schemas through the official SDK.
@@ -21,9 +29,9 @@
 - Responsive scientific diagrams, single-path/comparison control, velocity arrows, and dynamic reduced-motion support.
 - Compact Notebook history navigation and the **Explain it differently** companion workflow.
 
-## Verification record
+## Verification record from the earlier redesign (historical)
 
-Verified on November 14, 2026, in the supplied Windows workspace.
+Verified on November 14, 2026, before the performance/teaching follow-up. The current counts above supersede this retained historical table.
 
 | Check | Result |
 | --- | --- |
@@ -69,6 +77,6 @@ The live integration repair replaced native `response_schema` with `response_jso
 
 ## Next improvements
 
-1. Evaluate live teaching quality with students and observe latency across repeated sessions. The redesigned live browser scenario took 21.0 seconds for generation, adaptation, a check, and reload.
+1. Evaluate live teaching quality with students and collect a larger latency distribution across fresh questions, cached repeats, and different network conditions.
 2. Expand the misconception and understanding-check content using feedback from students and physics educators.
 3. Add a verified function-graph family after the projectile workflow has been demonstrated reliably.

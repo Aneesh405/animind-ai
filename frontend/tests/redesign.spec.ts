@@ -60,9 +60,9 @@ test("landing teaching preview changes SVG and clearly labels its provenance", a
   await expect(preview.getByTestId("lesson-scene")).toHaveAttribute("data-scene", "trajectories");
   await preview.getByRole("button", { name: "The components", exact: true }).click();
   await expect(preview.getByTestId("lesson-scene")).toHaveAttribute("data-scene", "components");
-  await expect(preview.locator(".scene-canvas polyline")).toHaveCount(0);
+  await expect(preview.locator(".scene-canvas polyline")).toHaveCount(1);
   await expect(preview.locator(".scene-canvas marker")).toHaveCount(1);
-  await expect(preview.getByRole("img", { name: /Initial velocity decomposition/ })).toBeVisible();
+  await expect(preview.getByRole("img", { name: /Velocity components during projectile flight/ })).toBeVisible();
   expect(teachingRequests).toEqual([]);
 });
 
@@ -95,7 +95,7 @@ test("adaptive transition preserves the selected step and presents different dia
   await expect(page.getByRole("status").filter({ hasText: "Switching to another visual strategy" })).toBeVisible();
   await expect(page.getByTestId("lesson-step-2")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("lesson-scene")).toHaveAttribute("data-scene", "components");
-  await expect(page.getByTestId("adaptation-banner")).toContainText("Velocity decomposition");
+  await expect(page.getByTestId("adaptation-banner")).toContainText("Velocity components in flight");
   await page.getByTestId("lesson-scene").screenshot({ path: "design-review/components-1440.png" });
   await page.setViewportSize({ width: 390, height: 900 });
   await page.getByTestId("lesson-scene").screenshot({ path: "design-review/components-390.png" });

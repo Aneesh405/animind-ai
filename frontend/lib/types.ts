@@ -57,6 +57,7 @@ export interface Lesson {
   verification: { status: "verified"; method: string; scope: string };
   suggested_questions: string[];
   mode: Mode;
+  planning_source?: "demo" | "gemini" | "gemini_cache" | null;
   strategy_history: SceneType[];
   adaptation: null | {
     selected_step_id: string;

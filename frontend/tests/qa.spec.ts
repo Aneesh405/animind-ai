@@ -46,13 +46,14 @@ test("QA playback changes projectile positions and scrubbing reaches physical en
   await page.getByRole("button", { name: "Replay animation" }).click();
   await expect
     .poll(async () => Number(await timeline.inputValue()))
-    .toBeGreaterThan(0.06);
+    .toBeGreaterThan(0.4);
   await page
     .getByRole("button", { name: "Pause animation", exact: true })
     .click();
   const pausedTime = await timeline.inputValue();
   const pausedX = await ball.getAttribute("cx");
   const pausedY = await ball.getAttribute("cy");
+  expect(Number(pausedX)).toBeGreaterThan(65);
   await page.waitForTimeout(350);
   expect(await timeline.inputValue()).toBe(pausedTime);
   expect(await ball.getAttribute("cx")).toBe(pausedX);
@@ -200,7 +201,7 @@ test("QA exact confusion changes SVG strategy and the happy journey has clean ru
         .poll(async () =>
           Number(await page.getByLabel("Animation timeline").inputValue()),
         )
-        .toBeCloseTo((number - 1) / 3, 2);
+        .toBeCloseTo([.16, .56, .8][number - 1], 2);
     }
 
     await page.getByTestId("lesson-step-2").click();
@@ -219,10 +220,10 @@ test("QA exact confusion changes SVG strategy and the happy journey has clean ru
     expect(lesson.scene).toBe("components");
     expect(lesson.strategy_history).toEqual(["trajectories", "components"]);
     await expect(scene).toHaveAttribute("data-scene", "components");
-    await expect(scene.locator(".scene-canvas polyline")).toHaveCount(0);
+    await expect(scene.locator(".scene-canvas polyline")).toHaveCount(1);
     await expect(scene.locator("marker")).toHaveCount(1);
     await expect(
-      scene.getByRole("img", { name: /Initial velocity decomposition/ }),
+      scene.getByRole("img", { name: /Velocity components during projectile flight/ }),
     ).toBeVisible();
     await expect(
       page.getByText("Predefined demo hypothesis", { exact: true }),

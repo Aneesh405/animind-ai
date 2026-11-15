@@ -36,6 +36,10 @@ The existing secure backend configuration is used as-is. No key belongs in front
 | 2:25-2:50 | Read the current understanding check, choose an answer, and click **Check my understanding**. | Feedback explains the relationship. A wrong answer offers **Try another visual**. |
 | 2:50-3:00 | Close with: "When one explanation doesn't connect, Animind finds another way to show the idea." | Leave the scientific lesson visible for questions. |
 
+The visual has six chapters: **Knowns → Components → Equations → Motion → Calculation → Meaning**. Select **Motion**, then Play, to show the flight immediately. In the velocity perspective, pause near the apex: the vertical arrow reaches zero while horizontal velocity stays constant and gravity still points down. The full guided sequence stops on its conclusion. In a trajectory lesson, the comparison cards expose range, airtime, and sideways speed for 30°, 45°, and 60°.
+
+For a repeat of the exact same initial question within five minutes in the same session, the app may show **Saved Gemini plan**. Explain that this reuses a validated plan and recalculates physics; it is not a new model generation. Adaptation always makes a new live request in Gemini mode. Allow for variable cloud latency and retain the explicitly labeled Demo fallback.
+
 Question:
 
 > Why does a projectile travel farthest at 45 degrees?
