@@ -8,6 +8,10 @@ This MVP focuses on ideal projectile motion, launch-angle comparisons, and initi
 
 The Learning Atelier redesign adds an interactive public landing page at `/` and a focused scientific notebook at `/studio`. Inter and Instrument Serif are hosted locally, canonical equations use native MathML, and the physics canvas has dedicated desktop/mobile layouts. The existing backend, secure Gemini configuration, and Demo workflow are preserved. Design decisions and the source checkpoint are recorded in [DESIGN_CHANGELOG.md](DESIGN_CHANGELOG.md).
 
+## Multi-subject learning
+
+The studio now includes Mathematics, Physics, Chemistry, Biology, and Computer Science. Eight trusted interactive visualizations cover linear/quadratic functions, projectile motion, a simple pendulum, Newton’s second law, water, an animal cell, and bubble sort. Other topics use written explanations. The existing projectile notebook, Voice Tutor, and Red Pen remain available. See [MULTI_SUBJECT_LEARNING.md](MULTI_SUBJECT_LEARNING.md) for demos, architecture, scientific limits, test results, and macOS/Linux launch commands.
+
 ## What you can do
 
 - Ask a supported question and explore an animated lesson with play, pause, replay, scrubbing, and fullscreen controls.

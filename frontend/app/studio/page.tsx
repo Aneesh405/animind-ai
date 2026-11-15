@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LearningStudio from "../../components/studio/LearningStudio";
+import SubjectStudio from "../../components/studio/SubjectStudio";
 
 export const metadata: Metadata = {
   title: "Learning Studio — Animind AI",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function StudioPage() {
-  return <LearningStudio />;
+  return <SubjectStudio />;
 }

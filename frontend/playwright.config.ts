@@ -18,7 +18,7 @@ export default defineConfig({
   webServer: [
     {
       command:
-        "..\\backend\\.venv\\Scripts\\python.exe -m uvicorn main:app --app-dir ..\\backend --host 127.0.0.1 --port 8000",
+        process.platform === "win32" ? "..\\backend\\.venv\\Scripts\\python.exe -m uvicorn main:app --app-dir ..\\backend --host 127.0.0.1 --port 8000" : "../backend/.venv/bin/python -m uvicorn main:app --app-dir ../backend --host 127.0.0.1 --port 8000",
       url: "http://localhost:8000/health",
       reuseExistingServer: true,
       timeout: 30000,
