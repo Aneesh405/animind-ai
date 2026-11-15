@@ -28,8 +28,6 @@ export function useLearningStudio() {
   const [whatIfResult, setWhatIfResult] = useState("");
   const [answer, setAnswer] = useState("");
   const [checkResult, setCheckResult] = useState<CheckResult | null>(null);
-  const [speaking, setSpeaking] = useState(false);
-  const [speechAvailable, setSpeechAvailable] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const questionInput = useRef<HTMLTextAreaElement>(null);
   const confusionInput = useRef<HTMLTextAreaElement>(null);
@@ -73,7 +71,6 @@ export function useLearningStudio() {
           id = crypto.randomUUID();
         }
         setSessionId(id);
-        setSpeechAvailable("speechSynthesis" in window);
         const [status, supported, history] = await Promise.all([
           api<Health>("/health"),
           api<Topic[]>("/api/supported-topics"),
@@ -117,14 +114,6 @@ export function useLearningStudio() {
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => {
-    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    setSpeaking(false);
-    return () => {
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    };
-  }, [lesson?.id, lesson?.scene, selectedStepId]);
 
   async function perform(label: string, operation: () => Promise<void>) {
     if (busyRef.current) return;
@@ -332,26 +321,6 @@ export function useLearningStudio() {
     setCheckResult(null);
   }
 
-  function narrate() {
-    if (!lesson || !speechAvailable) return;
-    if (speaking) {
-      window.speechSynthesis.cancel();
-      setSpeaking(false);
-      return;
-    }
-    const selected = lesson.steps.find((step) => step.id === selectedStepId) || lesson.steps[activeStage];
-    const utterance = new SpeechSynthesisUtterance(
-      selected
-        ? `${selected.title}. ${selected.text}`
-        : `${lesson.title}. ${lesson.explanation}`,
-    );
-    utterance.rate = 0.93;
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-    window.speechSynthesis.speak(utterance);
-    setSpeaking(true);
-  }
-
   const selectedIndex =
     lesson?.steps.findIndex((step) => step.id === selectedStepId) ?? -1;
   const selectedStep = lesson?.steps[selectedIndex];
@@ -372,10 +341,10 @@ export function useLearningStudio() {
     topics, health, busy, error, setError, document, setDocument, selectedStepId,
     setSelectedStepId, selectStep, focusVersion, activeStage, setActiveStage, confusion, setConfusion,
     whatIf, setWhatIf, whatIfResult, answer, setAnswer, checkResult, setCheckResult,
-    speaking, speechAvailable, fileInput, questionInput, confusionInput,
+    fileInput, questionInput, confusionInput,
     selectedIndex, selectedStep, metrics, isPreview,
     generate, adapt, explore, checkUnderstanding, upload, openLesson, newLesson,
-    updateParameter, resetParameters, narrate, perform, saveParameters,
+    updateParameter, resetParameters, perform, saveParameters,
   };
 }
 
