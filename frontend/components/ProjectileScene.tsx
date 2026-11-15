@@ -19,6 +19,7 @@ interface SceneProps {
   steps?: Step[];
   focusVersion?: number;
   onInteract?: () => void;
+  comparisonAngles?: number[];
 }
 
 export default function ProjectileScene({
@@ -32,6 +33,7 @@ export default function ProjectileScene({
   steps,
   focusVersion = 0,
   onInteract,
+  comparisonAngles,
 }: SceneProps) {
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -149,6 +151,7 @@ export default function ProjectileScene({
             stage={steps ? chapter : stage}
             compact={compact}
             compare={compare}
+            comparisonAngles={comparisonAngles}
             markerId={`${markerId}-velocity`}
           />
         )}
@@ -182,7 +185,7 @@ export default function ProjectileScene({
           </>
         ) : (
           <>
-            {(mode === "trajectories" && !compare ? [parameters.angle] : [30, 45, 60]).map((angle) => (
+            {(mode === "trajectories" && !compare ? [parameters.angle] : comparisonAngles || [30, 45, 60]).map((angle) => (
               <span key={angle}>
                 <i style={{ background: (COLORS[angle] || SELECTED_COLOR) }} />
                 {angle}° {angle === 45 && <small>max range</small>}

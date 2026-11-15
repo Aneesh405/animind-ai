@@ -16,9 +16,11 @@ const tick = (value: number) => (value >= 10000 ? compactTicks : regularTicks).f
 
 type DiagramProps = { parameters: Parameters; progress: number; compact: boolean };
 
-export function Trajectories({ parameters, progress, stage, markerId, compact, compare }: DiagramProps & { stage: number; markerId: string; compare: boolean }) {
+export function Trajectories({ parameters, progress, stage, markerId, compact, compare, comparisonAngles }: DiagramProps & { stage: number; markerId: string; compare: boolean; comparisonAngles?: number[] }) {
+  const comparisonKey = comparisonAngles?.join(",") || "30,45,60";
   const geometry = useMemo(() => {
-    const angles = compare ? Array.from(new Set([30, 45, 60, parameters.angle])) : [parameters.angle];
+    const configuredAngles = comparisonKey.split(",").map(Number);
+    const angles = compare ? Array.from(new Set([...configuredAngles, parameters.angle])) : [parameters.angle];
     const left = compact ? 45 : 65;
     const ground = compact ? 283 : 298;
     const width = compact ? 343 : 660;
@@ -38,7 +40,7 @@ export function Trajectories({ parameters, progress, stage, markerId, compact, c
       return { angle, metrics, points, polyline: points.map((point) => `${point.x},${point.y}`).join(" ") };
     });
     return { left, ground, width, height, rangeBound, heightBound, xScale, yScale, sample, paths, duration: Math.max(...paths.map((path) => path.metrics.flight_time), .01) };
-  }, [parameters.angle, parameters.speed, parameters.gravity, compact, compare]);
+  }, [parameters.angle, parameters.speed, parameters.gravity, compact, compare, comparisonKey]);
   const { left, ground, width, height, rangeBound, heightBound, paths } = geometry;
   const time = progress * geometry.duration;
   const chartWidth = compact ? 420 : 780;

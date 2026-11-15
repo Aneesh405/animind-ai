@@ -1,5 +1,22 @@
 # Animind AI - performance and animated teaching verification
 
+## Red Pen Challenge verification - November 14, 2026
+
+The optional projectile-motion **Red Pen Challenge** was implemented on local branch `feature/red-pen-challenge`. It uses a deterministic three-question bank with one indexed misconception per challenge and no Gemini call. Deliberate errors render only after the clearly labelled challenge is opened. **Show Me Why** reuses the production trajectory and velocity-component SVG scenes with values from the existing physics engine.
+
+| Verification | Result |
+| --- | --- |
+| Focused Red Pen suite | **5 passed**: bank integrity, physics claims, full journey, reveal flow, mobile/keyboard/reduced-motion/axe |
+| Complete backend suite | **98 passed**, 0 failed; one dependency deprecation warning |
+| Frontend type check | **Passed** |
+| Frontend production build | **Passed**; `/`, `/studio`, `/icon.svg`, and not-found route prerendered |
+| Complete default frontend suite | **48 passed, 1 skipped**, 0 failed; the skipped test is the explicitly opt-in real-Gemini browser test |
+| Visual review | **Passed** at 1440px desktop and 390px mobile without overflow |
+
+The full browser run retained lesson generation, playback, sliders, adaptive diagrams, PDFs, failure handling, favicon, responsiveness, and accessibility. The Red Pen journey verified retry and reveal actions, all three real SVG corrections, correct numerical evidence, completion scoring, and zero `/api/lesson` or `/api/adapt` requests from the challenge. Live Gemini was not rerun because this feature does not use it and the quota-consuming browser test remains explicitly opt-in. The existing live-integration results below are unchanged.
+
+The Red Pen MVP is intentionally limited to ideal, equal-height projectile motion with no air resistance. Session struggle tracking is local to the mounted challenge and used only for the completion review suggestion. No account, database, leaderboard, or dynamic AI-generated misconception was added.
+
 ## Current result - November 14, 2026
 
 The existing application was improved on branch `feature/animated-teaching-performance`. The premium design, working Demo/Gemini paths, PDF workflow, session ownership, revision handling, scene allowlist, strict plan validation, and existing local changes were preserved. This verification record was captured before the separately authorized commit/push. The source checkpoint is `../animind-checkpoints/before-teaching-fix-20261114-201728.zip`; credentials, dependencies, and runtime data were excluded.
