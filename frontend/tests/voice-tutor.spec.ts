@@ -228,7 +228,9 @@ test("all registered projectile cues are reachable and visual motion pauses with
   await player.getByRole("button", { name: "Previous" }).click();
   await expect(scene).toHaveAttribute("data-guided-cue", "play_descent");
   const visual = scene.locator("svg[data-time]");
-  await expect.poll(async () => Number(await visual.getAttribute("data-time"))).toBeGreaterThan(0);
+  // Pause immediately after entering the moving scene. Waiting for a positive
+  // timestamp first is racy on slower runners: the 3.8-second descent can
+  // legitimately reach its landing endpoint while Playwright is polling.
   await player.getByRole("button", { name: "Pause" }).click();
   const paused = await visual.getAttribute("data-time");
   await page.waitForTimeout(350);
