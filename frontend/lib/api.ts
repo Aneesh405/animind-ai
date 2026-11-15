@@ -1,8 +1,14 @@
 const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "development" ? "http://localhost:8000" : "")
 ).replace(/\/$/, "");
 
 export async function api<T>(path: string, body?: unknown): Promise<T> {
+  if (!API_URL) {
+    throw new Error(
+      "The production learning engine URL is not configured. Add NEXT_PUBLIC_API_URL and redeploy AniMind.",
+    );
+  }
   const started = performance.now();
   const timing = process.env.NODE_ENV === "development" && path === "/api/lesson";
   const controller = new AbortController();

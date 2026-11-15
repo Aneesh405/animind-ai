@@ -30,9 +30,17 @@ from teaching import SYSTEM_INSTRUCTION
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 app = FastAPI(title="Animind AI", version="1.0.0", description="Adaptive visual lessons for ideal projectile motion.")
-origins = [origin.strip() for origin in os.getenv("FRONTEND_ORIGIN", "http://localhost:3000").split(",") if origin.strip()]
-if "http://localhost:3000" in origins:
-    origins.append("http://127.0.0.1:3000")
+
+LOCAL_FRONTEND_ORIGINS = ("http://localhost:3000", "http://127.0.0.1:3000")
+
+
+def frontend_origins(configured: str | None) -> list[str]:
+    """Return exact production origins while retaining both local development aliases."""
+    production = [origin.strip().rstrip("/") for origin in (configured or "").split(",") if origin.strip()]
+    return list(dict.fromkeys([*LOCAL_FRONTEND_ORIGINS, *production]))
+
+
+origins = frontend_origins(os.getenv("FRONTEND_ORIGIN"))
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=False, allow_methods=["GET", "POST"], allow_headers=["Content-Type"], expose_headers=["Server-Timing"])
 store = Store(os.getenv("ANIMIND_DB_PATH", str(BASE_DIR / "data" / "animind.sqlite3")))
 plan_cache = PlanCache()

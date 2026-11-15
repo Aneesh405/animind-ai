@@ -395,3 +395,12 @@ def test_cors(client):
     assert loopback.headers["access-control-allow-origin"] == "http://127.0.0.1:3000"
     other = client.options("/api/lesson", headers={"Origin": "https://unrelated.example", "Access-Control-Request-Method": "POST"})
     assert other.status_code == 400
+
+
+def test_production_origins_are_exact_and_keep_local_development():
+    assert main.frontend_origins("https://animind.example/, https://preview.animind.example") == [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://animind.example",
+        "https://preview.animind.example",
+    ]
