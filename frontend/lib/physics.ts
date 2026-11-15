@@ -32,8 +32,22 @@ export function sameParameters(left: Parameters, right: Parameters): boolean {
   );
 }
 
+/** Analytic flight, clamped at first return to launch height; no bounce model. */
+export function sampleFlight(parameters: Parameters, elapsed: number, angle = parameters.angle) {
+  const metrics = calculate(parameters, angle);
+  const time = Math.max(0, Math.min(elapsed, metrics.flight_time));
+  return {
+    time,
+    x: metrics.horizontal_velocity * time,
+    y: Math.max(0, metrics.vertical_velocity * time - parameters.gravity * time ** 2 / 2),
+    vx: metrics.horizontal_velocity,
+    vy: metrics.vertical_velocity - parameters.gravity * time,
+    landed: elapsed >= metrics.flight_time,
+  };
+}
+
 export const SCENE_NAMES = {
   trajectories: "Trajectory comparison",
-  components: "Velocity decomposition",
+  components: "Velocity components in flight",
   range_comparison: "Range comparison",
 };

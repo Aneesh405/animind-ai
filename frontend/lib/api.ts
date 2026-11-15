@@ -3,6 +3,8 @@ const API_URL = (
 ).replace(/\/$/, "");
 
 export async function api<T>(path: string, body?: unknown): Promise<T> {
+  const started = performance.now();
+  const timing = process.env.NODE_ENV === "development" && path === "/api/lesson";
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 55000);
   try {
@@ -18,7 +20,13 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
       signal: controller.signal,
       cache: "no-store",
     });
+    const received = performance.now();
     const data = await response.json().catch(() => null);
+    if (timing) {
+      // Fixed labels only: never put prompts, document text or session IDs in diagnostics.
+      performance.measure("animind:lesson-request", { start: started, end: received });
+      performance.measure("animind:lesson-decode", { start: received, end: performance.now() });
+    }
     if (!response.ok) {
       const detail = data?.detail;
       const message =
