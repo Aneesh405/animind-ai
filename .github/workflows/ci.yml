@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Project checks
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      # Live Gemini is opt-in locally; this workflow never uses credentials.
+      ANIMIND_LIVE_GEMINI_TEST: '0'
+      GEMINI_API_KEY: ''
+      GEMINI_MODEL: ''
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install backend dependencies
+        run: |
+          python -m venv backend/.venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & ./backend/.venv/Scripts/python.exe -m pip install -r backend/requirements.txt
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run backend tests
+        working-directory: backend
+        run: '& ./.venv/Scripts/python.exe -m pytest -q'
+
+      - name: Check frontend types
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Install Playwright browser
+        working-directory: frontend
+        # playwright.config.ts selects the Google Chrome channel.
+        run: npx playwright install --with-deps chrome
+
+      - name: Run default browser suite (live Gemini skipped)
+        id: browser-tests
+        working-directory: frontend
+        run: npm run test:e2e -- --reporter=list,html
+
+      - name: Upload browser failure diagnostics
+        if: ${{ failure() && steps.browser-tests.outcome == 'failure' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-failure-diagnostics
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
